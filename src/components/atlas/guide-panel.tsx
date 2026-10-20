@@ -165,7 +165,7 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState, local
           <div className="guide-suggestions">{suggestions.map((question) => <button type="button" key={question} onClick={() => void ask(question)}>{question}</button>)}</div>
         </div>}
         {messages.map((message, index) => <article key={index} className={`guide-message guide-message-${message.role}`}>
-          <span className="guide-message-label">{message.role === "user" ? copy.guideYou : "MURA"}</span>
+          <span className="guide-message-label">{message.role === "user" ? copy.guideYou : "МҰРА"}</span>
           <p>{message.text}</p>
           {message.citations && message.citations.length > 0 && <div className="guide-citations">
             <strong>{copy.sources}</strong>

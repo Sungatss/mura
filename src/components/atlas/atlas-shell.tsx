@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { BrandMark } from "@/components/brand-mark";
+import { ThemeToggle } from "@/components/theme-provider";
 import { useCallback, useEffect, useState } from "react";
 import { GuidePanel } from "./guide-panel";
 import { LearningPanel } from "./learning-panel";
@@ -78,11 +80,12 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    document.title = `MURA | ${copy.brandSubtitle}`;
+    document.title = `МҰРА | ${copy.brandSubtitle}`;
     document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute("content", copy.atlasIntro);
   }, [locale, copy]);
 
   function selectEra(id: string) {
+    if (id === selectedId) return;
     setSelectedEventId(null);
     setSelectedFigureId(null);
     setData(null);
@@ -130,31 +133,32 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
 
   return <main className="atlas-shell">
     <header className="atlas-header">
-      <div className="brand-lockup" aria-label={`MURA, ${copy.brandSubtitle}`}>
-        <span className="brand-mark" aria-hidden="true">M</span>
-        <div className="brand-text"><strong>MURA</strong><span>{copy.brandSubtitle}</span></div>
+      <div className="brand-lockup" aria-label={`МҰРА, ${copy.brandSubtitle}`}>
+        <BrandMark />
+        <div className="brand-text"><strong>МҰРА</strong><span>{copy.brandSubtitle}</span></div>
       </div>
       <div className="header-actions">
-        <span className="header-status">{copy.headerStatus}</span>
+        <span className="header-status"><span aria-hidden="true" />{copy.headerStatus}</span>
+        <ThemeToggle locale={locale} />
         <div className="locale-switch" role="group" aria-label={copy.languageLabel}>
           {(["kk", "ru", "en"] as const).map((option) => <button key={option} type="button"
             lang={option} aria-label={option === "kk" ? "Қазақша" : option === "ru" ? "Русский" : "English"}
             aria-pressed={locale === option} onClick={() => setLocalePreference(option)}>{option.toUpperCase()}</button>)}
         </div>
         <button type="button" className="guide-trigger" aria-expanded={guideOpen} aria-controls="guide-title"
-          onClick={() => { setLearningOpen(false); setGuideOpen((current) => !current); }}>{copy.guideTrigger}</button>
+          onClick={() => { setLearningOpen(false); setGuideOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M5 4h14v12H9l-4 4V4Z" /><path d="M9 8h6M9 12h4" /></svg>{copy.guideTrigger}</button>
         <button type="button" className="guide-trigger" aria-expanded={learningOpen} aria-controls="learn-title"
-          onClick={() => { setGuideOpen(false); setLearningOpen((current) => !current); }}>{copy.learnTrigger}</button>
+          onClick={() => { setGuideOpen(false); setLearningOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M12 5C8 2 3 4 3 4v15s5-2 9 1c4-3 9-1 9-1V4s-5-2-9 1Zm0 0v15" /></svg>{copy.learnTrigger}</button>
       </div>
     </header>
     <div className="atlas-workspace">
       <nav className="timeline-region" aria-label={copy.timelineLabel}>
         <div className="section-heading"><h2>{copy.periods}</h2><span>{formatCount(locale, 3, copy.cuts.split("|") as [string, string, string])}</span></div>
         <div className="timeline" role="group" aria-label={copy.timelineGroup}>
-          {eras.filter((era) => era.kind === "historical-reconstruction").map((era) => <button
+          {eras.filter((era) => era.kind === "historical-reconstruction").map((era, index) => <button
             key={era.id} type="button" className={`timeline-option${selectedId === era.id ? " is-active" : ""}`}
             aria-pressed={selectedId === era.id} onClick={() => selectEra(era.id)}>
-            <span className="timeline-dot" aria-hidden="true" /><span>{eraText(era, "label", locale)}</span>
+            <span className="timeline-index" aria-hidden="true">0{index + 1}</span><span className="timeline-dot" aria-hidden="true" /><span>{eraText(era, "label", locale)}</span>
           </button>)}
         </div>
         {process.env.NODE_ENV === "development" && <button type="button" className={`fixture-option${selectedId === "technical-fixture" ? " is-active" : ""}`}

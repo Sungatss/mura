@@ -1,45 +1,66 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/components/theme-provider";
 import { ui } from "@/data/ui-translations";
 import type { EraDataset, EventFeature, PointGeometry } from "@/lib/atlas/types";
 import type { Locale } from "@/lib/i18n";
 
-const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
+const BASEMAP_STYLES = { light: "https://tiles.openfreemap.org/styles/liberty", dark: "https://tiles.openfreemap.org/styles/dark" };
 const EMPTY = { type: "FeatureCollection" as const, features: [] };
 
 type MapCanvasProps = { data: EraDataset | null; eraId: string; locale: Locale; onSelectEvent?: (id: string) => void };
 
 export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps) {
+  const { theme } = useTheme();
+  const themeRef = useRef(theme);
+  const lastFitData = useRef<EraDataset | null>(null);
+  const lastFitSize = useRef("");
+  const [mapRevision, setMapRevision] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("maplibre-gl").Map | null>(null);
   const onSelectEventRef = useRef(onSelectEvent);
   const [mapState, setMapState] = useState<"loading" | "ready" | "error">("loading");
 
+  useEffect(() => {
+    themeRef.current = theme;
+    const map = mapRef.current;
+    if (map) {
+      if (containerRef.current) delete containerRef.current.dataset.loadedTheme;
+      map.setStyle(BASEMAP_STYLES[theme]);
+    }
+  }, [theme]);
+
   useEffect(() => { onSelectEventRef.current = onSelectEvent; }, [onSelectEvent]);
 
   useEffect(() => {
-    const copy = ui[locale];
-    const container = containerRef.current;
-    container?.setAttribute("aria-label", copy.mapInteractive);
-    const canvas = mapRef.current?.getCanvas();
-    canvas?.setAttribute("aria-label", copy.mapInteractive);
-    for (const [selector, label] of [
-      [".maplibregl-ctrl-zoom-in", copy.mapZoomIn],
-      [".maplibregl-ctrl-zoom-out", copy.mapZoomOut],
-      [".maplibregl-ctrl-attrib-button", copy.mapAttributionToggle],
-    ]) {
-      const control = container?.querySelector<HTMLElement>(selector);
-      control?.setAttribute("aria-label", label);
-      control?.setAttribute("title", label);
-    }
-    // Translate only the connector text inserted by the basemap, preserving provider links.
-    const attribution = container?.querySelector(".maplibregl-ctrl-attrib-inner");
-    for (const node of attribution?.childNodes ?? []) {
-      if (node.nodeType === Node.TEXT_NODE && node.textContent) {
-        node.textContent = node.textContent.replace(/Data from|Данные:|Деректер:/g, copy.mapDataFrom);
+    function localizeControls() {
+      const copy = ui[locale];
+      const container = containerRef.current;
+      container?.setAttribute("aria-label", copy.mapInteractive);
+      const canvas = mapRef.current?.getCanvas();
+      canvas?.setAttribute("aria-label", copy.mapInteractive);
+      for (const [selector, label] of [
+        [".maplibregl-ctrl-zoom-in", copy.mapZoomIn],
+        [".maplibregl-ctrl-zoom-out", copy.mapZoomOut],
+        [".maplibregl-ctrl-attrib-button", copy.mapAttributionToggle],
+      ]) {
+        const control = container?.querySelector<HTMLElement>(selector);
+        control?.setAttribute("aria-label", label);
+        control?.setAttribute("title", label);
+      }
+      // Translate only the connector text inserted by the basemap, preserving provider links.
+      const attribution = container?.querySelector(".maplibregl-ctrl-attrib-inner");
+      for (const node of attribution?.childNodes ?? []) {
+        if (node.nodeType === Node.TEXT_NODE && node.textContent) {
+          node.textContent = node.textContent.replace(/Data from|Данные:|Деректер:/g, copy.mapDataFrom);
+        }
       }
     }
+    localizeControls();
+    const map = mapRef.current;
+    map?.on("idle", localizeControls);
+    return () => { map?.off("idle", localizeControls); };
   }, [locale, mapState]);
 
   useEffect(() => {
@@ -57,19 +78,20 @@ export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps
 
         map = new maplibregl.Map({
           container: containerRef.current,
-          style: BASEMAP_STYLE,
+          style: BASEMAP_STYLES[themeRef.current],
           center: [67.5, 48.2],
           zoom: 4,
           minZoom: 2,
         });
         mapRef.current = map;
+        map.on("resize", () => setMapRevision((value) => value + 1));
 
         map.addControl(
           new maplibregl.NavigationControl({ showCompass: false }),
           "top-right",
         );
 
-        map.on("load", () => {
+        map.on("style.load", () => {
           if (cancelled || !map) return;
           map.addSource("atlas-territories", { type: "geojson", data: EMPTY });
           map.addLayer({
@@ -82,7 +104,7 @@ export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps
             id: "atlas-territory-outline",
             type: "line",
             source: "atlas-territories",
-            paint: { "line-color": "#745629", "line-width": 2 },
+            paint: { "line-color": themeRef.current === "dark" ? "#d4b67e" : "#745629", "line-width": 2 },
           });
           map.addSource("atlas-events", { type: "geojson", data: EMPTY });
           map.addLayer({
@@ -96,20 +118,21 @@ export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps
               "circle-stroke-width": 2,
             },
           });
-          map.on("click", (event) => {
-            if (!map) return;
-            const { x, y } = event.point;
-            const [feature] = map.queryRenderedFeatures(
-              [[x - 12, y - 12], [x + 12, y + 12]],
-              { layers: ["atlas-event-points"] },
-            );
-            const id = feature?.properties?.id;
-            if (typeof id === "string") onSelectEventRef.current?.(id);
-          });
-          map.on("mouseenter", "atlas-event-points", () => { if (map) map.getCanvas().style.cursor = "pointer"; });
-          map.on("mouseleave", "atlas-event-points", () => { if (map) map.getCanvas().style.cursor = ""; });
+          setMapRevision((value) => value + 1);
           setMapState("ready");
         });
+        map.on("click", (event) => {
+          if (!map?.getLayer("atlas-event-points")) return;
+          const { x, y } = event.point;
+          const [feature] = map.queryRenderedFeatures(
+            [[x - 12, y - 12], [x + 12, y + 12]],
+            { layers: ["atlas-event-points"] },
+          );
+          const id = feature?.properties?.id;
+          if (typeof id === "string") onSelectEventRef.current?.(id);
+        });
+        map.on("mouseenter", "atlas-event-points", () => { if (map) map.getCanvas().style.cursor = "pointer"; });
+        map.on("mouseleave", "atlas-event-points", () => { if (map) map.getCanvas().style.cursor = ""; });
         map.on("error", (event) => {
           if (!cancelled && !map?.isStyleLoaded()) {
             console.error("Basemap could not load", event.error);
@@ -135,8 +158,10 @@ export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps
 
   useEffect(() => {
     const map = mapRef.current;
-    if (mapState !== "ready" || !map) return;
+    if (mapState !== "ready" || !map?.getSource("atlas-territories") || !map.getSource("atlas-events")) return;
     let cancelled = false;
+    const loadedTheme = themeRef.current;
+    const viewportSize = `${containerRef.current?.clientWidth}:${containerRef.current?.clientHeight}`;
     const territories = map.getSource("atlas-territories") as import("maplibre-gl").GeoJSONSource;
     const events = map.getSource("atlas-events") as import("maplibre-gl").GeoJSONSource;
     const mappedEvents = {
@@ -150,14 +175,17 @@ export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps
       territories.setData(data?.territories ?? EMPTY),
       events.setData(mappedEvents),
     ]).then(() => {
-      if (!cancelled && data && containerRef.current) containerRef.current.dataset.loadedEra = eraId;
+      if (!cancelled && data && containerRef.current) {
+        containerRef.current.dataset.loadedEra = eraId;
+        containerRef.current.dataset.loadedTheme = loadedTheme;
+      }
     }).catch((error) => {
       if (!cancelled) {
         console.error("Atlas layers could not update", error);
         setMapState("error");
       }
     });
-    if (data && (data.territories.features.length || data.events.features.some((feature) => feature.geometry))) {
+    if (data && (data !== lastFitData.current || viewportSize !== lastFitSize.current) && (data.territories.features.length || data.events.features.some((feature) => feature.geometry))) {
       const bounds = { west: 180, south: 90, east: -180, north: -90 };
       for (const feature of data.territories.features) {
         const polygons = feature.geometry.type === "Polygon"
@@ -182,6 +210,8 @@ export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps
           bounds.north = Math.max(bounds.north, lat);
         }
       }
+      lastFitData.current = data;
+      lastFitSize.current = viewportSize;
       map.fitBounds(
         [[bounds.west, bounds.south], [bounds.east, bounds.north]],
         {
@@ -192,7 +222,7 @@ export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps
       );
     }
     return () => { cancelled = true; };
-  }, [data, eraId, mapState]);
+  }, [data, eraId, mapState, mapRevision]);
 
   return (
     <div className="map-frame">

@@ -11,6 +11,17 @@ export const sources: SourceReference[] = [
     archiveSha256: "e10a4e429fca708788ff9e7572a95fce801fae55852d217cffabc1c59cd4eed4",
     note: "Полигоны извлечены без изменения координат из cliopatria_polities_only_v021.geojson. Датировки и границы отражают одну из исследовательских реконструкций.",
   },
+  { id: "eh-kerei", title: "Qazaqstan Tarihy: Керей хан", url: "https://e-history.kz/ru/prominent-figures/show/12623", license: "Все права защищены", accessedOn: "2026-10-20", note: "Биографическая статья; факты пересказаны своими словами." },
+  { id: "eh-janibek", title: "Qazaqstan Tarihy: Жанибек хан", url: "https://e-history.kz/ru/prominent-figures/show/12638", license: "Все права защищены", accessedOn: "2026-10-20", note: "Биографическая статья; факты пересказаны своими словами." },
+  { id: "eh-tahir", title: "Qazaqstan Tarihy: Tahir khan", url: "https://e-history.kz/en/prominent-figures/show/12760", license: "Все права защищены", accessedOn: "2026-10-20", note: "Биографическая статья; датировка отличается от другого материала портала." },
+  { id: "eh-sixteenth", title: "Qazaqstan Tarihy: ХVІ ғ. Қазақ хандығы", url: "https://e-history.kz/kz/amp/history-of-kazakhstan/show/8619", license: "Все права защищены", accessedOn: "2026-10-20", note: "Обзор истории Казахского ханства XVI века." },
+  { id: "eh-aknazar", title: "Qazaqstan Tarihy: Акназар", url: "https://e-history.kz/ru/prominent-figures/show/12654", license: "Все права защищены", accessedOn: "2026-10-20", note: "Биографическая статья; в ней есть противоречивые датировки начала правления." },
+  { id: "eh-disaster", title: "Qazaqstan Tarihy: Джунгарские нашествия", url: "https://e-history.kz/ru/history-of-kazakhstan/show/9176.", license: "Все права защищены", accessedOn: "2026-10-20", note: "Обзор нашествий и годов Великого бедствия." },
+  { id: "eh-chronology", title: "Qazaqstan Tarihy: Казахское ханство — хронология", url: "https://e-history.kz/ru/chronology/event/131", license: "Все права защищены", accessedOn: "2026-10-20", note: "Хронология Ордабасы, Буланты и Аныракая." },
+  { id: "eh-battles-textbook", title: "История Казахстана, учебник 10 класса (архив Qazaqstan Tarihy)", url: "https://e-history.kz/storage/upload/library_ru_files/iblock/56e/56ed152e20f17fc9d06f3853da612bb1.pdf", license: "Все права защищены", accessedOn: "2026-10-20", note: "Приводит альтернативные датировки битв." },
+  { id: "eh-abulkhair", title: "Qazaqstan Tarihy: Абулхаир (Абилхаир)", url: "https://e-history.kz/ru/prominent-figures/show/12613", license: "Все права защищены", accessedOn: "2026-10-20", note: "Биографическая статья о хане Младшего жуза." },
+  { id: "eh-oath", title: "Qazaqstan Tarihy: Посольство А. Тевкелева и присяга 1731 года", url: "https://e-history.kz/media/scorm/30/text/text.htm", license: "Все права защищены", accessedOn: "2026-10-20", note: "Образовательный материал о событиях 10 октября 1731 года." },
+  { id: "ordabasy-monument", title: "Open Kazakhstan: Ордабасыдағы серуен", url: "https://openkazakhstan.kz/journals/%D0%9E%D1%80%D0%B4%D0%B0%D0%B1%D0%B0%D1%81%D1%8B%D0%B4%D0%B0%D2%93%D1%8B-%D1%81%D0%B5%D1%80%D1%83%D0%B5%D0%BD/", license: "Все права защищены", accessedOn: "2026-10-20", note: "Координаты современного монумента «Бірлік» на Ордабасы, а не точного места курултая." },
 ];
 
 export const eras: Era[] = [
@@ -23,7 +34,7 @@ export const eras: Era[] = [
     kind: "historical-reconstruction",
     territoryUrl: "/data/eras/kazakh-1468-1474/territories.geojson",
     eventUrl: "/data/eras/kazakh-1468-1474/events.geojson",
-    sourceIds: ["cliopatria-v021"],
+    sourceIds: ["cliopatria-v021", "eh-kerei", "eh-janibek"],
   },
   {
     id: "kazakh-1529-1555",
@@ -34,7 +45,7 @@ export const eras: Era[] = [
     kind: "historical-reconstruction",
     territoryUrl: "/data/eras/kazakh-1529-1555/territories.geojson",
     eventUrl: "/data/eras/kazakh-1529-1555/events.geojson",
-    sourceIds: ["cliopatria-v021"],
+    sourceIds: ["cliopatria-v021", "eh-tahir", "eh-sixteenth", "eh-aknazar"],
   },
   {
     id: "kazakh-1721-1737",
@@ -45,7 +56,7 @@ export const eras: Era[] = [
     kind: "historical-reconstruction",
     territoryUrl: "/data/eras/kazakh-1721-1737/territories.geojson",
     eventUrl: "/data/eras/kazakh-1721-1737/events.geojson",
-    sourceIds: ["cliopatria-v021"],
+    sourceIds: ["cliopatria-v021", "eh-disaster", "eh-chronology", "eh-battles-textbook", "eh-abulkhair", "eh-oath", "ordabasy-monument"],
   },
   {
     id: "technical-fixture",

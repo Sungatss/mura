@@ -1,4 +1,4 @@
-import type { Era, EraDataset, SourceReference } from "./types";
+import type { Era, EraDataset, HistoricalFigure, SourceReference } from "./types";
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -26,6 +26,7 @@ function ring(value: unknown): boolean {
 }
 
 function geometry(value: unknown, kind: "territory" | "event"): boolean {
+  if (kind === "event" && value === null) return true;
   if (!record(value)) return false;
   if (kind === "event") return value.type === "Point" && position(value.coordinates);
   if (value.type === "Polygon") {
@@ -42,7 +43,7 @@ export function validateCatalog(eras: Era[], sources: SourceReference[]): void {
   const sourceIds = new Set<string>();
   for (const source of sources) {
     if (!source.id || sourceIds.has(source.id) || !source.title || !source.license || !source.accessedOn
-      || !source.url.startsWith("https://") || !source.licenseUrl.startsWith("https://")
+      || !source.url.startsWith("https://") || (source.licenseUrl !== undefined && !source.licenseUrl.startsWith("https://"))
       || (source.archiveSha256 !== undefined && !/^[a-f0-9]{64}$/.test(source.archiveSha256))) {
       fail(`неполный или повторный источник ${source.id}`);
     }
@@ -93,7 +94,8 @@ export function validateEraData(
         }
       } else if (props.certainty === "technical-fixture" || props.sourceIds.length === 0
         || props.startYear === null || props.endYear === null
-        || props.startYear !== era.startYear || props.endYear !== era.endYear
+        || (kind === "territory" && (props.startYear !== era.startYear || props.endYear !== era.endYear))
+        || (kind === "event" && ((props.startYear as number) < era.startYear! || (props.endYear as number) > era.endYear!))
         || props.sourceIds.some((id) => !era.sourceIds.includes(id))) {
         fail(`${era.id}: исторические данные без датировки или источника`);
       }
@@ -104,7 +106,60 @@ export function validateEraData(
         && props.certainty !== "verified" && props.certainty !== "approximate") {
         fail(`${era.id}: событие без оценки точности`);
       }
+      if (kind === "event" && era.kind === "historical-reconstruction") {
+        const mapped = props.coordinateStatus === "verified" || props.coordinateStatus === "approximate";
+        if (!record(props.dateLabel) || typeof props.dateLabel.ru !== "string" || !props.dateLabel.ru.trim()
+          || !record(props.description) || typeof props.description.ru !== "string" || !props.description.ru.trim()
+          || !Array.isArray(props.figureIds) || props.figureIds.some((id) => typeof id !== "string")
+          || (props.highlightRank !== null && (!Number.isInteger(props.highlightRank) || (props.highlightRank as number) < 1))
+          || !Array.isArray(props.coordinateSourceIds)
+          || props.coordinateSourceIds.some((id) => !knownSourceIds.has(id) || !era.sourceIds.includes(id))
+          || (mapped && (feature.geometry === null || props.coordinateSourceIds.length === 0 || !record(props.coordinateNote) || !props.coordinateNote.ru))
+          || (!mapped && (props.coordinateStatus !== "not-mapped" || feature.geometry !== null || props.coordinateSourceIds.length !== 0))) {
+          fail(`${era.id}: неполное событие или неподтверждённая координата ${props.id}`);
+        }
+      }
     }
   }
   return { territories, events } as EraDataset;
+}
+
+export function validateHistoricalContent(
+  eras: Era[], datasets: EraDataset[], figures: HistoricalFigure[], knownSourceIds: ReadonlySet<string>,
+): void {
+  const eraIds = new Set(eras.filter((era) => era.kind === "historical-reconstruction").map((era) => era.id));
+  const events = datasets.flatMap((dataset) => dataset.events.features)
+    .filter((feature) => eraIds.has(feature.properties.eraId));
+  const eventIds = new Set<string>();
+  const highlights = new Set<string>();
+  for (const { properties: event } of events) {
+    if (eventIds.has(event.id)) fail(`повторное событие ${event.id}`);
+    eventIds.add(event.id);
+    if (event.highlightRank !== null) {
+      const key = `${event.eraId}:${event.highlightRank}`;
+      if (highlights.has(key)) fail(`повторный акцент ${key}`);
+      highlights.add(key);
+    }
+  }
+  const figureIds = new Set<string>();
+  for (const figure of figures) {
+    if (!figure.id || figureIds.has(figure.id) || !figure.name.ru || !figure.description.ru
+      || figure.eraIds.length === 0 || figure.eventIds.length === 0 || figure.sourceIds.length === 0
+      || figure.eraIds.some((id) => !eraIds.has(id))
+      || figure.sourceIds.some((id) => !knownSourceIds.has(id))
+      || figure.eventIds.some((id) => !eventIds.has(id))) fail(`неполная персона ${figure.id}`);
+    figureIds.add(figure.id);
+    for (const id of figure.eventIds) {
+      const event = events.find((item) => item.properties.id === id)!.properties;
+      if (!figure.eraIds.includes(event.eraId) || !event.figureIds?.includes(figure.id)) {
+        fail(`несогласованная связь ${figure.id} ↔ ${id}`);
+      }
+    }
+  }
+  for (const { properties: event } of events) {
+    if (event.figureIds?.some((id) => !figureIds.has(id)
+      || !figures.find((figure) => figure.id === id)?.eventIds.includes(event.id))) {
+      fail(`несогласованная персона у события ${event.id}`);
+    }
+  }
 }

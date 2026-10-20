@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { EraDataset } from "@/lib/atlas/types";
+import type { EraDataset, EventFeature, PointGeometry } from "@/lib/atlas/types";
 
 const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 const EMPTY = { type: "FeatureCollection" as const, features: [] };
 
-type MapCanvasProps = { data: EraDataset | null; eraId: string };
+type MapCanvasProps = { data: EraDataset | null; eraId: string; onSelectEvent?: (id: string) => void };
 
-export function MapCanvas({ data, eraId }: MapCanvasProps) {
+export function MapCanvas({ data, eraId, onSelectEvent }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("maplibre-gl").Map | null>(null);
+  const onSelectEventRef = useRef(onSelectEvent);
   const [mapState, setMapState] = useState<"loading" | "ready" | "error">("loading");
+
+  useEffect(() => { onSelectEventRef.current = onSelectEvent; }, [onSelectEvent]);
 
   useEffect(() => {
     let map: import("maplibre-gl").Map | undefined;
@@ -67,6 +70,18 @@ export function MapCanvas({ data, eraId }: MapCanvasProps) {
               "circle-stroke-width": 2,
             },
           });
+          map.on("click", (event) => {
+            if (!map) return;
+            const { x, y } = event.point;
+            const [feature] = map.queryRenderedFeatures(
+              [[x - 12, y - 12], [x + 12, y + 12]],
+              { layers: ["atlas-event-points"] },
+            );
+            const id = feature?.properties?.id;
+            if (typeof id === "string") onSelectEventRef.current?.(id);
+          });
+          map.on("mouseenter", "atlas-event-points", () => { if (map) map.getCanvas().style.cursor = "pointer"; });
+          map.on("mouseleave", "atlas-event-points", () => { if (map) map.getCanvas().style.cursor = ""; });
           setMapState("ready");
         });
         map.on("error", (event) => {
@@ -98,10 +113,16 @@ export function MapCanvas({ data, eraId }: MapCanvasProps) {
     let cancelled = false;
     const territories = map.getSource("atlas-territories") as import("maplibre-gl").GeoJSONSource;
     const events = map.getSource("atlas-events") as import("maplibre-gl").GeoJSONSource;
+    const mappedEvents = {
+      type: "FeatureCollection" as const,
+      features: data?.events.features.filter(
+        (feature): feature is EventFeature & { geometry: PointGeometry } => feature.geometry !== null,
+      ) ?? [],
+    };
     if (containerRef.current) delete containerRef.current.dataset.loadedEra;
     void Promise.all([
       territories.setData(data?.territories ?? EMPTY),
-      events.setData(data?.events ?? EMPTY),
+      events.setData(mappedEvents),
     ]).then(() => {
       if (!cancelled && data && containerRef.current) containerRef.current.dataset.loadedEra = eraId;
     }).catch((error) => {
@@ -110,7 +131,7 @@ export function MapCanvas({ data, eraId }: MapCanvasProps) {
         setMapState("error");
       }
     });
-    if (data?.territories.features.length) {
+    if (data && (data.territories.features.length || data.events.features.some((feature) => feature.geometry))) {
       const bounds = { west: 180, south: 90, east: -180, north: -90 };
       for (const feature of data.territories.features) {
         const polygons = feature.geometry.type === "Polygon"
@@ -124,6 +145,15 @@ export function MapCanvas({ data, eraId }: MapCanvasProps) {
               bounds.north = Math.max(bounds.north, lat);
             }
           }
+        }
+      }
+      for (const feature of data.events.features) {
+        if (feature.geometry) {
+          const [lng, lat] = feature.geometry.coordinates;
+          bounds.west = Math.min(bounds.west, lng);
+          bounds.south = Math.min(bounds.south, lat);
+          bounds.east = Math.max(bounds.east, lng);
+          bounds.north = Math.max(bounds.north, lat);
         }
       }
       map.fitBounds(

@@ -1,1 +1,192 @@
-{"type":"FeatureCollection","features":[]}
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "great-disaster",
+        "eraId": "kazakh-1721-1737",
+        "kind": "event",
+        "name": {
+          "ru": "Годы Великого бедствия"
+        },
+        "dateLabel": {
+          "ru": "1723–1727"
+        },
+        "description": {
+          "ru": "Джунгарские вторжения вызвали массовые переселения, голод и потери среди казахского населения. Эти годы сохранились в исторической памяти как «Ақтабан шұбырынды, Алқакөл сұлама»."
+        },
+        "startYear": 1723,
+        "endYear": 1727,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "placeLabel": {
+          "ru": "Несколько областей Казахского ханства"
+        },
+        "figureIds": [],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-disaster"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ordabasy-kurultai",
+        "eraId": "kazakh-1721-1737",
+        "kind": "event",
+        "name": {
+          "ru": "Курултай в Ордабасы"
+        },
+        "dateLabel": {
+          "ru": "1726"
+        },
+        "description": {
+          "ru": "В Ордабасы представители казахских жузов обсуждали совместное сопротивление джунгарам. Абулхаир был избран военным руководителем объединённых сил."
+        },
+        "startYear": 1726,
+        "endYear": 1726,
+        "certainty": "verified",
+        "coordinateStatus": "approximate",
+        "coordinateSourceIds": [
+          "ordabasy-monument"
+        ],
+        "coordinateNote": {
+          "ru": "Приблизительный маркер: координаты современного монумента «Бірлік» на Ордабасы, а не доказанного места собрания 1726 года."
+        },
+        "placeLabel": {
+          "ru": "Ордабасы"
+        },
+        "figureIds": [
+          "abulkhair-younger"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-chronology",
+          "eh-abulkhair"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          69.24637,
+          42.310992
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bulanty-battle",
+        "eraId": "kazakh-1721-1737",
+        "kind": "event",
+        "name": {
+          "ru": "Битва при Буланты"
+        },
+        "dateLabel": {
+          "ru": "около 1726–1728"
+        },
+        "description": {
+          "ru": "Казахские силы одержали победу над джунгарами в районе рек Буланты и Белеуты. Источники называют среди участников Абулхаира и батыра Богенбая."
+        },
+        "startYear": 1726,
+        "endYear": 1728,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "В использованных источниках встречаются 1726, 1727 и 1728 годы. Точка сражения не нанесена без проверенной координаты."
+        },
+        "placeLabel": {
+          "ru": "Междуречье Буланты и Белеуты"
+        },
+        "figureIds": [
+          "abulkhair-younger"
+        ],
+        "highlightRank": 3,
+        "sourceIds": [
+          "eh-chronology",
+          "eh-battles-textbook",
+          "eh-abulkhair",
+          "eh-disaster"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "anyrakay-battle",
+        "eraId": "kazakh-1721-1737",
+        "kind": "event",
+        "name": {
+          "ru": "Аныракайская битва"
+        },
+        "dateLabel": {
+          "ru": "1729–1730"
+        },
+        "description": {
+          "ru": "Крупное сражение казахских сил с джунгарами в районе Аныракая; в источниках руководство связывают с Абулхаиром."
+        },
+        "startYear": 1729,
+        "endYear": 1730,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "Источники расходятся между 1729 и 1730 годами. Точная координата поля боя не установлена."
+        },
+        "placeLabel": {
+          "ru": "Район Аныракая"
+        },
+        "figureIds": [
+          "abulkhair-younger"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-chronology",
+          "eh-battles-textbook",
+          "eh-abulkhair"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "oath-1731",
+        "eraId": "kazakh-1721-1737",
+        "kind": "event",
+        "name": {
+          "ru": "Присяга Абулхаира и части старшин Младшего жуза"
+        },
+        "dateLabel": {
+          "ru": "10 октября 1731"
+        },
+        "description": {
+          "ru": "Абулхаир и часть старшин Младшего жуза принесли присягу Российской империи. Это решение не означало единовременного присоединения всех казахских жузов."
+        },
+        "startYear": 1731,
+        "endYear": 1731,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "Материал называет 27 старшин; степень согласия внутри Младшего жуза была неоднородной."
+        },
+        "figureIds": [
+          "abulkhair-younger"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-oath",
+          "eh-abulkhair"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

@@ -1,1 +1,142 @@
-{"type":"FeatureCollection","features":[]}
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tahir-late-rule",
+        "eraId": "kazakh-1529-1555",
+        "kind": "event",
+        "name": {
+          "ru": "Поздний период правления Тахира"
+        },
+        "dateLabel": {
+          "ru": "около 1529–1533"
+        },
+        "description": {
+          "ru": "В поздний период власти Тахира ханство переживало междоусобицы; его политическая опора сместилась к Жетысу и кыргызским союзникам."
+        },
+        "startYear": 1529,
+        "endYear": 1533,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "Материалы Qazaqstan Tarihy расходятся в дате окончания правления Тахира: около 1529–1531 и 1533 год."
+        },
+        "placeLabel": {
+          "ru": "Жетысу"
+        },
+        "figureIds": [
+          "tahir"
+        ],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-tahir",
+          "eh-sixteenth"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "buidash-zhetysu",
+        "eraId": "kazakh-1529-1555",
+        "kind": "event",
+        "name": {
+          "ru": "Буйдаш во главе объединения в Жетысу"
+        },
+        "dateLabel": {
+          "ru": "1533–1534"
+        },
+        "description": {
+          "ru": "После Тахира Буйдаш возглавил часть казахско-кыргызского объединения в Жетысу. В это же время в других областях действовали иные казахские ханы."
+        },
+        "startYear": 1533,
+        "endYear": 1534,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "placeLabel": {
+          "ru": "Жетысу"
+        },
+        "figureIds": [
+          "buidash"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-sixteenth"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "gubin-report",
+        "eraId": "kazakh-1529-1555",
+        "kind": "event",
+        "name": {
+          "ru": "Сообщение Данилы Губина о борьбе у Ташкента"
+        },
+        "dateLabel": {
+          "ru": "1535: дата сообщения"
+        },
+        "description": {
+          "ru": "Русский посланец Данила Губин в сообщении 1535 года передал сведения о казахских столкновениях с ташкентскими правителями. Дата сообщения не устанавливает точную дату или место боёв."
+        },
+        "startYear": 1535,
+        "endYear": 1535,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "Событием в атласе является датированное сообщение; сами столкновения могли происходить раньше."
+        },
+        "placeLabel": {
+          "ru": "Район Ташкента"
+        },
+        "figureIds": [],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-aknazar"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "haknazar-1555",
+        "eraId": "kazakh-1529-1555",
+        "kind": "event",
+        "name": {
+          "ru": "Усиление власти Хакназара"
+        },
+        "dateLabel": {
+          "ru": "1555"
+        },
+        "description": {
+          "ru": "Биографический материал Qazaqstan Tarihy относит к 1555 году признание власти Хакназара большинством родов Старшего жуза."
+        },
+        "startYear": 1555,
+        "endYear": 1555,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "Тот же материал противоречиво датирует начало ханского правления Хакназара; событие передано как оценка источника."
+        },
+        "figureIds": [
+          "haknazar"
+        ],
+        "highlightRank": 3,
+        "sourceIds": [
+          "eh-aknazar"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

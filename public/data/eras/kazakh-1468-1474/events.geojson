@@ -1,1 +1,108 @@
-{"type":"FeatureCollection","features":[]}
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "abulkhair-death",
+        "eraId": "kazakh-1468-1474",
+        "kind": "event",
+        "name": {
+          "ru": "Смерть Абулхаира во время похода"
+        },
+        "dateLabel": {
+          "ru": "около 1468–1469"
+        },
+        "description": {
+          "ru": "Шибанид Абулхаир умер во время похода против Казахского ханства. После этого противостояние за власть в Восточном Дешт-и-Кыпчаке продолжилось."
+        },
+        "startYear": 1468,
+        "endYear": 1469,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "В источнике указана приблизительная датировка; точное место смерти не установлено."
+        },
+        "figureIds": [],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-kerei",
+          "eh-janibek"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "shaybanid-struggle",
+        "eraId": "kazakh-1468-1474",
+        "kind": "event",
+        "name": {
+          "ru": "Борьба Керея и Жанибека с Шибанидами"
+        },
+        "dateLabel": {
+          "ru": "после 1468/1469, в начале 1470-х"
+        },
+        "description": {
+          "ru": "После смерти Абулхаира Керей и Жанибек боролись с Шибанидами за политическое влияние в Восточном Дешт-и-Кыпчаке. Это был процесс, а не одно сражение с установленной точкой на карте."
+        },
+        "startYear": 1469,
+        "endYear": 1474,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "Начало и конец борьбы не датируются одним днём; интервал ограничен выбранным срезом атласа."
+        },
+        "placeLabel": {
+          "ru": "Восточный Дешт-и-Кыпчак"
+        },
+        "figureIds": [
+          "kerei",
+          "janibek"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-kerei",
+          "eh-janibek"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kerei-last-record",
+        "eraId": "kazakh-1468-1474",
+        "kind": "event",
+        "name": {
+          "ru": "Последнее упоминание Керея в источниках"
+        },
+        "dateLabel": {
+          "ru": "зима 1473/1474"
+        },
+        "description": {
+          "ru": "Имя Керея в исторических свидетельствах последний раз упоминается в связи с событиями зимы 1473/1474 года. Эта дата не является доказанной датой его смерти."
+        },
+        "startYear": 1473,
+        "endYear": 1474,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "uncertaintyNote": {
+          "ru": "Последнее упоминание и дата смерти — разные исторические утверждения."
+        },
+        "figureIds": [
+          "kerei"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-kerei"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

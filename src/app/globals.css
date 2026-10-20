@@ -543,6 +543,43 @@ button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px sol
   .guide-form textarea { font-size: 16px; }
   .legal-header-actions { flex-wrap: wrap; gap: 12px; }
 }
+
+/* Source-backed event layer. Marker buttons remain accessible above the map canvas. */
+.map-tools, .map-empty { position: absolute; z-index: 2; left: 20px; max-width: min(270px, calc(100% - 82px)); border: 1px solid var(--line); border-radius: 10px; background: var(--paper); box-shadow: var(--shadow); }
+.map-tools { top: 66px; width: 222px; padding: 9px 10px; }
+.map-tools label { display: block; margin-bottom: 5px; color: var(--accent); font: 700 9px/1.3 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
+.map-tools select { width: 100%; min-height: 30px; padding: 4px 26px 4px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--navy); font: 11px/1.3 var(--sans); cursor: pointer; }
+.map-tools select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.map-empty { top: 148px; padding: 10px 12px; color: var(--muted); font: 11px/1.5 var(--sans); }
+.map-event-marker { --marker-color: #a67c3d; position: relative; display: grid; place-items: center; width: 42px; height: 42px; padding: 8px; border: 2px solid var(--marker-color); border-radius: 50%; background: var(--paper); color: var(--navy); box-shadow: 0 3px 12px #102a3840, 0 0 0 5px #fcfaf5a8; cursor: pointer; }
+.map-event-marker svg { width: 23px; height: 23px; transition: transform 180ms ease; }
+.map-event-marker:hover, .map-event-marker:focus-visible, .map-event-marker.is-selected { border-color: var(--gold); box-shadow: 0 5px 18px #102a3866, 0 0 0 6px color-mix(in srgb, var(--gold) 27%, transparent); }
+.map-event-marker:hover svg, .map-event-marker:focus-visible svg { transform: scale(1.1); }
+.map-event-marker.is-selected { background: var(--header); color: var(--header-text); }
+.map-event-marker-conflict { --marker-color: #ad6b58; }
+.map-event-marker-records { --marker-color: #5f7881; }
+.map-event-marker-diplomacy { --marker-color: #6f8979; }
+.map-event-marker-other { --marker-color: #7c8581; }
+.map-marker-preview { position: absolute; bottom: calc(100% + 10px); left: 50%; width: 205px; padding: 12px 13px; border: 1px solid var(--line); border-top: 2px solid var(--marker-color); border-radius: 10px; background: var(--paper); color: var(--navy); box-shadow: var(--shadow); text-align: left; pointer-events: none; opacity: 0; visibility: hidden; transform: translate(-50%, 6px); transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease; }
+.map-marker-preview > span { display: block; }
+.map-marker-date, .map-marker-location { color: var(--accent); font: 700 10px/1.35 var(--sans); }
+.map-marker-title { margin: 5px 0; font: 17px/1.3 var(--serif); }
+.map-marker-location { color: var(--muted); font-weight: 400; }
+@media (hover: hover) { .map-event-marker:hover .map-marker-preview { opacity: 1; visibility: visible; transform: translate(-50%, 0); } }
+.map-event-marker:focus-visible .map-marker-preview { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.event-detail { border-top: 2px solid var(--gold); animation: panel-enter 220ms ease both; }
+.event-detail.is-closing { animation: event-exit 160ms ease both; pointer-events: none; }
+.event-detail-category { display: inline-block; margin-top: 19px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--accent); font: 700 10px/1.3 var(--sans); letter-spacing: .04em; }
+.event-detail h1 { margin-top: 11px; }
+.event-detail .detail-date { display: inline-flex; padding: 6px 10px; border-radius: 6px; background: color-mix(in srgb, var(--gold) 12%, var(--paper)); }
+.event-detail .source-list li { padding: 11px 0; border-bottom: 1px solid var(--line); }
+@keyframes event-exit { to { opacity: 0; transform: translateY(6px); } }
+@media (max-width: 600px) {
+  .map-tools, .map-empty { left: 12px; max-width: calc(100% - 76px); }
+  .map-tools { top: 57px; width: 208px; padding: 7px 8px; }
+  .map-empty { top: 131px; }
+  .map-event-marker { width: 40px; height: 40px; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }

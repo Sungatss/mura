@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-provider";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GuidePanel } from "./guide-panel";
 import { LearningPanel } from "./learning-panel";
 import { MapCanvas } from "./map-canvas";
 import { eras, sources } from "@/data/atlas";
+import { eventCategory, type EventCategory } from "@/data/event-categories";
 import { figures } from "@/data/figures";
 import { ui } from "@/data/ui-translations";
 import { legal } from "@/data/legal";
@@ -60,18 +61,32 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const locale = useLocale(initialLocale);
   const [selectedId, setSelectedId] = useState(eras[0].id);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [closingEventId, setClosingEventId] = useState<string | null>(null);
   const [selectedFigureId, setSelectedFigureId] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<EventCategory | "all">("all");
   const [data, setData] = useState<EraDataset | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [retry, setRetry] = useState(0);
   const [guideOpen, setGuideOpen] = useState(false);
   const [learningOpen, setLearningOpen] = useState(false);
+  const panelRef = useRef<HTMLElement>(null);
   const closeGuide = useCallback(() => setGuideOpen(false), []);
   const closeLearning = useCallback(() => setLearningOpen(false), []);
   const copy = ui[locale];
   const selectedEra = eras.find((era) => era.id === selectedId) ?? eras[0];
   const territorySource = sources.find((item) => item.id === "cliopatria-v021");
   const events = data?.events.features ?? [];
+  const categoryLabels: Record<EventCategory, string> = {
+    politics: copy.mapCategoryPolitics,
+    conflict: copy.mapCategoryConflict,
+    records: copy.mapCategoryRecords,
+    diplomacy: copy.mapCategoryDiplomacy,
+    other: copy.mapCategoryOther,
+  };
+  const categories = [...new Set(events.map((feature) => eventCategory(feature.properties.id)))];
+  const locatedCount = events.filter((feature) => feature.geometry
+    && (selectedEra.kind === "technical-fixture" || !!feature.properties.coordinateSourceIds?.length)
+    && (categoryFilter === "all" || eventCategory(feature.properties.id) === categoryFilter)).length;
   const activeEvent = events.find((feature) => feature.properties.id === selectedEventId);
   const eraFigures = figures.filter((figure) => figure.eraIds.includes(selectedId));
   const activeFigure = eraFigures.find((figure) => figure.id === selectedFigureId);
@@ -87,15 +102,33 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   function selectEra(id: string) {
     if (id === selectedId) return;
     setSelectedEventId(null);
+    setClosingEventId(null);
     setSelectedFigureId(null);
+    setCategoryFilter("all");
     setData(null);
     setLoadState("loading");
     setSelectedId(id);
   }
 
-  function openEvent(id: string) {
+  function openEvent(id: string, fromMap = false) {
+    const selected = events.find((feature) => feature.properties.id === id);
+    if (selected?.geometry && categoryFilter !== "all" && eventCategory(id) !== categoryFilter) setCategoryFilter("all");
+    setGuideOpen(false);
+    setLearningOpen(false);
     setSelectedFigureId(null);
+    setClosingEventId(null);
     setSelectedEventId(id);
+    if (fromMap && window.matchMedia("(max-width: 960px)").matches) {
+      requestAnimationFrame(() => panelRef.current?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      }));
+    }
+  }
+
+  function closeEvent() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setSelectedEventId(null);
+    else setClosingEventId(selectedEventId);
   }
 
   function openFigure(id: string) {
@@ -167,19 +200,38 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         </button>}
       </nav>
       <section className="map-region" aria-label={copy.mapLabel}>
-        <MapCanvas data={data} eraId={selectedId} locale={locale} onSelectEvent={openEvent} />
+        <MapCanvas data={data} eraId={selectedId} locale={locale} categoryFilter={categoryFilter}
+          selectedEventId={selectedEventId} onSelectEvent={(id) => openEvent(id, true)} />
         <div className="map-caption"><span className="caption-rule" aria-hidden="true" />{copy.mapCaption}</div>
+        {selectedEra.kind === "historical-reconstruction" && <div className="map-tools">
+          <label htmlFor="map-category-filter">{copy.mapFilterLabel}</label>
+          <select id="map-category-filter" value={categoryFilter}
+            onChange={(event) => setCategoryFilter(event.target.value as EventCategory | "all")}>
+            <option value="all">{copy.mapCategoryAll}</option>
+            {categories.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}
+          </select>
+        </div>}
+        {loadState === "ready" && selectedEra.kind === "historical-reconstruction" && locatedCount === 0
+          && <div className="map-empty" role="status">{copy.mapNoLocatedEvents}</div>}
         {selectedEra.kind === "historical-reconstruction" && <div className="map-legend">
           <span className="legend-line" aria-hidden="true" />{copy.approxReconstruction}
           {events.some((feature) => feature.geometry) && <span className="legend-marker">{copy.approxMarker}</span>}
         </div>}
         {selectedEra.kind === "technical-fixture" && <div className="map-fixture-label">{copy.fixtureMapLabel}</div>}
       </section>
-      <aside className={`atlas-panel${guideOpen || learningOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : "panel-title"}>
+      <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : "panel-title"}>
         <div className="atlas-panel-content" hidden={guideOpen || learningOpen}>
         <div className="panel-overline">{activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
-        {activeEvent ? <>
-          <button className="back-link" type="button" onClick={() => setSelectedEventId(null)}>← {copy.backToPeriod} {eraText(selectedEra, "label", locale)}</button>
+        {activeEvent ? <section key={activeEvent.properties.id}
+          className={`event-detail${closingEventId === activeEvent.properties.id ? " is-closing" : ""}`}
+          onAnimationEnd={(event) => {
+            if (event.currentTarget === event.target && closingEventId === activeEvent.properties.id) {
+              setSelectedEventId(null);
+              setClosingEventId(null);
+            }
+          }}>
+          <button className="back-link" type="button" onClick={closeEvent}>← {copy.backToPeriod} {eraText(selectedEra, "label", locale)}</button>
+          <span className="event-detail-category">{categoryLabels[eventCategory(activeEvent.properties.id)]}</span>
           <h1 id="panel-title">{eventText(activeEvent.properties, "name", locale)}</h1>
           <p className="detail-date">{eventText(activeEvent.properties, "dateLabel", locale)}</p>
           <p className="detail-copy">{eventText(activeEvent.properties, "description", locale)}</p>
@@ -201,7 +253,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             <div className="section-heading"><h2 id="event-sources-title">{copy.sources}</h2></div>
             <SourceLinks ids={[...new Set([...activeEvent.properties.sourceIds, ...(activeEvent.properties.coordinateSourceIds ?? [])])]} locale={locale} />
           </section>}
-        </> : activeFigure ? <>
+        </section> : activeFigure ? <>
           <button className="back-link" type="button" onClick={() => setSelectedFigureId(null)}>← {copy.backToPeriod} {eraText(selectedEra, "label", locale)}</button>
           <h1 id="panel-title">{figureText(activeFigure, "name", locale)}</h1>
           <p className="detail-copy">{figureText(activeFigure, "description", locale)}</p>

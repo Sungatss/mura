@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { GuidePanel } from "./guide-panel";
 import { eras, sources } from "@/data/atlas";
 import { figures } from "@/data/figures";
 import type { EraDataset, EventFeature, HistoricalFigure } from "@/lib/atlas/types";
@@ -56,6 +57,8 @@ export function AtlasShell() {
   const [data, setData] = useState<EraDataset | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [retry, setRetry] = useState(0);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const closeGuide = useCallback(() => setGuideOpen(false), []);
   const selectedEra = eras.find((era) => era.id === selectedId) ?? eras[0];
   const territorySource = sources.find((item) => item.id === "cliopatria-v021");
   const events = data?.events.features ?? [];
@@ -117,7 +120,11 @@ export function AtlasShell() {
         <span className="brand-mark" aria-hidden="true">M</span>
         <div className="brand-text"><strong>MURA</strong><span>Исторический атлас Казахстана</span></div>
       </div>
-      <span className="header-status">Исторические реконструкции</span>
+      <div className="header-actions">
+        <span className="header-status">Исторические реконструкции</span>
+        <button type="button" className="guide-trigger" aria-expanded={guideOpen} aria-controls="guide-title"
+          onClick={() => setGuideOpen((current) => !current)}>Исторический гид</button>
+      </div>
     </header>
     <div className="atlas-workspace">
       <nav className="timeline-region" aria-label="Временная шкала">
@@ -143,7 +150,8 @@ export function AtlasShell() {
         </div>}
         {selectedEra.kind === "technical-fixture" && <div className="map-fixture-label">Технический слой · Не исторические данные</div>}
       </section>
-      <aside className="atlas-panel" aria-labelledby="panel-title">
+      <aside className={`atlas-panel${guideOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : "panel-title"}>
+        <div className="atlas-panel-content" hidden={guideOpen}>
         <div className="panel-overline">{activeEvent ? "02 / Событие" : activeFigure ? "03 / Персона" : "01 / Время и территория"}</div>
         {activeEvent ? <>
           <button className="back-link" type="button" onClick={() => setSelectedEventId(null)}>← К периоду {selectedEra.label.ru}</button>
@@ -226,6 +234,9 @@ export function AtlasShell() {
           <p>Современная картографическая основа: OpenFreeMap, атрибуция указана на карте.</p>
           {territorySource && <p>Исторические полигоны: <a href={territorySource.url} target="_blank" rel="noopener noreferrer">{territorySource.title}</a>. Лицензия <a href={territorySource.licenseUrl} target="_blank" rel="noopener noreferrer">{territorySource.license}</a>. Координаты не изменены при извлечении; доступ {territorySource.accessedOn}.</p>}
         </div>
+        </div>
+        <GuidePanel key={`${selectedId}:${selectedEventId ?? ""}:${selectedFigureId ?? ""}`}
+          open={guideOpen} onClose={closeGuide} era={selectedEra} event={activeEvent} figure={activeFigure} loadState={loadState} />
       </aside>
     </div>
   </main>;

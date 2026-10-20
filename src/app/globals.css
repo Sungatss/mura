@@ -44,6 +44,10 @@ body {
 .brand-text strong { font-size: 18px; letter-spacing: .17em; font-weight: 700; line-height: 1; }
 .brand-text span { font-size: 11px; letter-spacing: .025em; color: #b9c4c5; }
 .header-status { color: #c8d0cd; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+.header-actions { display: flex; align-items: center; gap: 20px; }
+.guide-trigger { padding: 9px 12px; border: 1px solid #ad8a50; background: transparent; color: var(--paper); font: 600 11px/1.2 Arial, sans-serif; letter-spacing: .06em; cursor: pointer; }
+.guide-trigger:hover, .guide-trigger[aria-expanded="true"] { background: #29414a; }
+.guide-trigger:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
 
 .atlas-workspace {
   flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 370px;
@@ -94,6 +98,9 @@ body {
   min-width: 0; min-height: 0; padding: 35px 31px 27px; overflow-y: auto;
   background: var(--paper); border-left: 1px solid var(--line);
 }
+.atlas-panel-content { display: flex; flex-direction: column; min-height: 100%; }
+.atlas-panel-content[hidden] { display: none; }
+.atlas-panel.is-guide-open { padding: 0; overflow: hidden; }
 .panel-overline { color: #8d6e3e; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; }
 .atlas-panel h1 { margin: 19px 0 13px; font: 400 clamp(32px, 3vw, 44px)/1.08 Georgia, serif; letter-spacing: -.035em; }
 .panel-intro { margin: 0; color: #4c6064; font-size: 14px; line-height: 1.65; }
@@ -169,16 +176,59 @@ body {
 .map-legend { flex-wrap: wrap; }
 .legend-marker { display: block; width: 100%; padding-left: 26px; color: #8b4d3d; }
 
+.guide-panel { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; background: var(--paper); }
+.guide-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 29px 25px 0; }
+.guide-top h2 { margin: 11px 0 0; font: 400 31px/1.05 Georgia, serif; letter-spacing: -.025em; }
+.guide-close { padding: 4px 0; border: 0; background: transparent; color: #765629; font: 12px/1.3 Arial, sans-serif; cursor: pointer; }
+.guide-close:hover { text-decoration: underline; }
+.guide-context { margin: 17px 25px 0; padding-bottom: 14px; border-bottom: 1px solid var(--line); color: #586b6c; font: 12px/1.45 Arial, sans-serif; overflow-wrap: anywhere; }
+.guide-language { display: flex; gap: 0; padding: 13px 25px 12px; border-bottom: 1px solid var(--line); }
+.guide-language button { border: 0; border-bottom: 2px solid transparent; padding: 6px 9px; background: transparent; color: #687776; font: 600 11px/1.2 Arial, sans-serif; cursor: pointer; }
+.guide-language button:first-child { padding-left: 0; }
+.guide-language button[aria-pressed="true"] { border-color: var(--gold); color: var(--navy); }
+.guide-messages { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 25px; overscroll-behavior: contain; }
+.guide-intro p, .guide-empty { margin: 0; color: #4c6064; font: 15px/1.55 Georgia, serif; }
+.guide-suggestions { display: flex; flex-direction: column; margin-top: 24px; border-top: 1px solid var(--line); }
+.guide-suggestions button { border: 0; border-bottom: 1px solid var(--line); padding: 13px 0; background: transparent; color: #72562e; font: 13px/1.45 Arial, sans-serif; text-align: left; cursor: pointer; }
+.guide-suggestions button:hover { color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+.guide-message { padding: 0 0 19px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.guide-message-label { color: #8d6e3e; font: 700 10px/1.2 Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+.guide-message p { margin: 8px 0 0; color: var(--navy); font: 14px/1.55 Georgia, serif; white-space: pre-wrap; overflow-wrap: anywhere; }
+.guide-message-user p { color: #536568; }
+.guide-citations { margin-top: 14px; padding-top: 11px; border-top: 1px solid var(--line); }
+.guide-citations strong { font: 700 10px/1.2 Arial, sans-serif; letter-spacing: .09em; text-transform: uppercase; }
+.guide-citations ul { margin: 7px 0 0; padding-left: 16px; }
+.guide-citations li { margin: 5px 0; font: 11px/1.45 Arial, sans-serif; overflow-wrap: anywhere; }
+.guide-citations a { color: #765629; text-underline-offset: 2px; }
+.guide-uncertainty { display: block; margin-top: 9px; color: #8b5d39; font: 11px/1.4 Arial, sans-serif; }
+.guide-pending { color: #765629; font: 12px/1.5 Arial, sans-serif; }
+.guide-error { padding: 12px; border-left: 2px solid #a76b50; background: #f3eae0; color: #744a37; font: 12px/1.5 Arial, sans-serif; }
+.guide-error p { margin: 0 0 7px; }
+.guide-error button { padding: 0; border: 0; background: transparent; color: #744a37; text-decoration: underline; cursor: pointer; }
+.guide-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 14px 25px 0; border-top: 1px solid var(--line); }
+.guide-form label { grid-column: 1 / -1; color: #5b6b6c; font: 700 10px/1.2 Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.guide-form textarea { width: 100%; min-width: 0; max-height: 115px; padding: 9px 10px; resize: vertical; border: 1px solid var(--line); border-radius: 0; background: #fffdfa; color: var(--navy); font: 12px/1.4 Arial, sans-serif; }
+.guide-form button { align-self: stretch; padding: 9px 10px; border: 1px solid var(--navy); background: var(--navy); color: var(--paper); font: 11px/1.2 Arial, sans-serif; cursor: pointer; }
+.guide-form button:disabled { opacity: .45; cursor: default; }
+.guide-disclaimer { margin: 9px 25px 16px; color: #788485; font: 10px/1.45 Arial, sans-serif; }
+.guide-panel button:focus-visible, .guide-panel textarea:focus-visible, .guide-panel a:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+.guide-backdrop { display: none; }
+
 @media (max-width: 960px) {
   .atlas-shell { height: auto; min-height: 100dvh; }
   .atlas-header { min-height: 64px; padding: 10px 18px; }
   .header-status { display: none; }
+  .header-actions { gap: 0; }
+  .guide-trigger { max-width: 110px; padding: 8px; font-size: 10px; }
   .atlas-workspace { display: flex; flex-direction: column; height: auto; min-height: 0; }
   .map-region { min-height: 0; height: 54dvh; flex: none; }
   .timeline-region { display: block; padding: 14px 22px 12px; }
   .timeline { margin-top: 12px; }
   .fixture-option { margin-top: 13px; border-top: 1px solid var(--line); padding: 8px 0 0; }
   .atlas-panel { border-left: 0; border-top: 3px solid var(--gold); padding: 24px 22px 26px; overflow: visible; }
+  .atlas-panel.is-guide-open { border-top: 0; overflow: visible; }
+  .guide-backdrop { display: block; position: fixed; inset: 0; z-index: 20; width: 100%; border: 0; background: rgba(20, 39, 49, .58); cursor: pointer; }
+  .guide-panel { position: fixed; inset: auto 0 0; z-index: 21; height: min(88dvh, 720px); border-top: 3px solid var(--gold); box-shadow: 0 -12px 28px rgba(20, 39, 49, .18); }
   .atlas-panel h1 { margin-top: 14px; font-size: 34px; }
   .panel-divider { margin: 21px 0; }
   .panel-footnote { padding-top: 30px; }
@@ -189,6 +239,14 @@ body {
 
 @media (max-width: 380px) {
   .brand-text span { font-size: 10px; }
+  .brand-lockup { gap: 8px; }
+  .brand-text strong { font-size: 16px; }
+  .guide-top { padding: 20px 17px 0; }
+  .guide-context { margin: 12px 17px 0; padding-bottom: 11px; }
+  .guide-language { padding: 8px 17px; }
+  .guide-messages { padding: 14px 17px; }
+  .guide-form { padding: 10px 17px 0; }
+  .guide-disclaimer { margin: 7px 17px 12px; }
   .map-region { height: 50dvh; min-height: 260px; }
   .section-heading { align-items: flex-start; flex-direction: column; }
 }

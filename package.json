@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "validate:data": "node scripts/validate-data.mjs"
+    "validate:data": "node scripts/validate-data.mjs",
+    "test:guide": "tsc src/lib/guide/validation.ts --module commonjs --target es2022 --skipLibCheck --outDir .next/guide-test && node tests/guide-validation.test.mjs"
   },
   "dependencies": {
     "maplibre-gl": "^6.15.0",

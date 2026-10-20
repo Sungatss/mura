@@ -14,6 +14,7 @@ function load(file) {
 
 const { learningQuestions } = load("src/data/learning.ts");
 const { questionsForScope, scoreAnswers, activityId } = load("src/lib/learning/quiz.ts");
+const { achievements, levelProgress, unlockedAchievements } = load("src/lib/learning/milestones.ts");
 const all = questionsForScope(learningQuestions, { kind: "all" });
 assert.equal(all.length, 10);
 assert.equal(questionsForScope(all, { kind: "era", id: "kazakh-1468-1474" }).length, 3);
@@ -25,4 +26,16 @@ assert.equal(scoreAnswers(all, all.map((question) => question.correctIndex)), 10
 assert.equal(scoreAnswers(all, all.map((question) => (question.correctIndex + 1) % 3)), 0);
 assert.equal(scoreAnswers(all, all.map((question, index) => index % 2 ? null : question.correctIndex)), 5);
 assert.equal(activityId("cards", { kind: "figure", id: "kerei" }), "cards:figure:kerei");
-console.log("Learning logic tests passed: scope filtering, figure links, scoring, activity IDs.");
+assert.equal(achievements.length, 6);
+assert.deepEqual(Array.from(unlockedAchievements([])), []);
+assert.deepEqual(Array.from(unlockedAchievements(["quiz:all", "quiz:all", "cards:figure:kerei"])), ["first-quiz", "first-cards", "atlas-quiz"]);
+assert.ok(unlockedAchievements([
+  "quiz:era:kazakh-1468-1474", "quiz:era:kazakh-1529-1555", "quiz:era:kazakh-1721-1737",
+  "cards:era:kazakh-1468-1474", "cards:era:kazakh-1529-1555", "cards:era:kazakh-1721-1737",
+  "quiz:figure:kerei", "quiz:figure:tahir", "quiz:figure:abulkhair-younger",
+]).includes("three-figures"));
+assert.equal(levelProgress(0, 200).level, 1);
+assert.equal(levelProgress(50, 200).level, 2);
+assert.equal(levelProgress(75, 200).current, 25);
+assert.deepEqual({ ...levelProgress(200, 200) }, { level: 5, current: 50, target: 50, complete: true });
+console.log("Learning logic tests passed: scopes, scoring, milestones, levels.");

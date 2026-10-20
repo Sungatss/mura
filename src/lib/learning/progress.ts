@@ -8,6 +8,7 @@ const storageKey = "mura-learning-v1";
 const changeEvent = "mura-learning-change";
 const validScopes = ["all", ...eras.filter((era) => era.kind === "historical-reconstruction").map((era) => `era:${era.id}`), ...figures.map((figure) => `figure:${figure.id}`)];
 const validActivities = new Set(validScopes.flatMap((scope) => [`quiz:${scope}`, `cards:${scope}`]));
+export const maxLearningXp = validActivities.size * 10;
 
 function snapshot() {
   try { return window.localStorage.getItem(storageKey) ?? "[]"; }

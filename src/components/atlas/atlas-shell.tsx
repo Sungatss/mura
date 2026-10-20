@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-provider";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -10,6 +11,8 @@ import { MapCanvas } from "./map-canvas";
 import { eras, sources } from "@/data/atlas";
 import { eventCategory, type EventCategory } from "@/data/event-categories";
 import { figures } from "@/data/figures";
+import { figureArtwork } from "@/data/figure-artwork";
+import { figureSignificance } from "@/data/figure-profiles";
 import { ui } from "@/data/ui-translations";
 import { legal } from "@/data/legal";
 import { eraText, eventText, figureText, sourceNote, sourceTitle, territoryText } from "@/data/historical-translations";
@@ -57,12 +60,29 @@ function FigureRow({ figure, locale, onSelect }: { figure: HistoricalFigure; loc
   </button></li>;
 }
 
+function CharacterCard({ figure, locale, eraLabel, onSelect }: { figure: HistoricalFigure; locale: Locale; eraLabel: string; onSelect: () => void }) {
+  const artwork = figureArtwork[figure.id];
+  const copy = ui[locale];
+  const eventCount = formatCount(locale, figure.eventIds.length, copy.linkedEventUnits.split("|") as [string, string, string]);
+  return <li><button type="button" className="character-card" onClick={onSelect} aria-label={`${copy.figureExplore}: ${figureText(figure, "name", locale)}`}>
+    <span className="character-card-image"><Image src={artwork.src} alt="" fill sizes="(max-width: 600px) 112px, 120px" style={{ objectPosition: artwork.position }} /></span>
+    <span className="character-card-content">
+      <span className="character-card-eyebrow">{copy.figureRole} <span aria-hidden="true">/</span> {eraLabel}</span>
+      <span className="character-card-title">{figureText(figure, "name", locale)}</span>
+      <span className="character-card-summary">{figureText(figure, "description", locale)}</span>
+      <span className="character-card-footer"><span>{eventCount}</span><span aria-hidden="true">↗</span></span>
+    </span>
+    <span className="character-card-art-label">{artwork.label[locale]}</span>
+  </button></li>;
+}
+
 export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const locale = useLocale(initialLocale);
   const [selectedId, setSelectedId] = useState(eras[0].id);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [closingEventId, setClosingEventId] = useState<string | null>(null);
   const [selectedFigureId, setSelectedFigureId] = useState<string | null>(null);
+  const [closingFigureId, setClosingFigureId] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<EventCategory | "all">("all");
   const [data, setData] = useState<EraDataset | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("loading");
@@ -104,6 +124,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     setSelectedEventId(null);
     setClosingEventId(null);
     setSelectedFigureId(null);
+    setClosingFigureId(null);
     setCategoryFilter("all");
     setData(null);
     setLoadState("loading");
@@ -116,6 +137,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     setGuideOpen(false);
     setLearningOpen(false);
     setSelectedFigureId(null);
+    setClosingFigureId(null);
     setClosingEventId(null);
     setSelectedEventId(id);
     if (fromMap && window.matchMedia("(max-width: 960px)").matches) {
@@ -133,7 +155,14 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
 
   function openFigure(id: string) {
     setSelectedEventId(null);
+    setClosingEventId(null);
+    setClosingFigureId(null);
     setSelectedFigureId(id);
+  }
+
+  function closeFigure() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setSelectedFigureId(null);
+    else setClosingFigureId(selectedFigureId);
   }
 
   useEffect(() => {
@@ -253,10 +282,28 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             <div className="section-heading"><h2 id="event-sources-title">{copy.sources}</h2></div>
             <SourceLinks ids={[...new Set([...activeEvent.properties.sourceIds, ...(activeEvent.properties.coordinateSourceIds ?? [])])]} locale={locale} />
           </section>}
-        </section> : activeFigure ? <>
-          <button className="back-link" type="button" onClick={() => setSelectedFigureId(null)}>← {copy.backToPeriod} {eraText(selectedEra, "label", locale)}</button>
-          <h1 id="panel-title">{figureText(activeFigure, "name", locale)}</h1>
-          <p className="detail-copy">{figureText(activeFigure, "description", locale)}</p>
+        </section> : activeFigure ? <section key={activeFigure.id}
+          className={`character-detail${closingFigureId === activeFigure.id ? " is-closing" : ""}`}
+          onAnimationEnd={(event) => {
+            if (event.currentTarget === event.target && closingFigureId === activeFigure.id) {
+              setSelectedFigureId(null);
+              setClosingFigureId(null);
+            }
+          }}>
+          <button className="back-link" type="button" onClick={closeFigure}>← {copy.backToPeriod} {eraText(selectedEra, "label", locale)}</button>
+          <div className="character-hero">
+            <Image src={figureArtwork[activeFigure.id].src} alt={figureArtwork[activeFigure.id].caption[locale]} fill sizes="(max-width: 960px) 100vw, 400px" priority style={{ objectPosition: figureArtwork[activeFigure.id].position }} />
+            <div className="character-hero-heading"><span>{copy.figureRole} · {eraText(selectedEra, "label", locale)}</span><h1 id="panel-title">{figureText(activeFigure, "name", locale)}</h1></div>
+          </div>
+          <p className="character-image-caption"><strong>{figureArtwork[activeFigure.id].label[locale]}</strong>{figureArtwork[activeFigure.id].caption[locale]}</p>
+          <section className="character-text-section" aria-labelledby="figure-biography-title">
+            <h2 id="figure-biography-title">{copy.figureBiography}</h2>
+            <p className="detail-copy">{figureText(activeFigure, "description", locale)}</p>
+          </section>
+          <section className="character-text-section character-significance" aria-labelledby="figure-significance-title">
+            <h2 id="figure-significance-title">{copy.figureSignificance}</h2>
+            <p>{figureSignificance(activeFigure.id, locale)}</p>
+          </section>
           <div className="panel-divider" />
           <section className="panel-section" aria-labelledby="related-events-title">
             <div className="section-heading"><h2 id="related-events-title">{copy.relatedEvents}</h2></div>
@@ -268,7 +315,12 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             <div className="section-heading"><h2 id="figure-sources-title">{copy.sources}</h2></div>
             <SourceLinks ids={activeFigure.sourceIds} locale={locale} />
           </section>
-        </> : <>
+          <div className="panel-divider" />
+          <section className="panel-section" aria-labelledby="figure-artwork-title">
+            <div className="section-heading"><h2 id="figure-artwork-title">{copy.figureArtworkSource}</h2></div>
+            <p className="character-artwork-credit">{copy.figureArtworkCredit}: {figureArtwork[activeFigure.id].creator}. <a href={figureArtwork[activeFigure.id].sourceUrl} target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a> · <a href={figureArtwork[activeFigure.id].licenseUrl} target="_blank" rel="noopener noreferrer">{figureArtwork[activeFigure.id].license}</a>. {copy.figureArtworkCrop}</p>
+          </section>
+        </section> : <>
           <h1 id="panel-title">{copy.atlasTitle}</h1>
           <p className="panel-intro">{copy.atlasIntro}</p>
           <div className="panel-divider" />
@@ -302,7 +354,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             <div className="panel-divider" />
             <section className="panel-section" aria-labelledby="figures-title">
               <div className="section-heading"><h2 id="figures-title">{copy.figures}</h2><span>{eraFigures.length}</span></div>
-              {eraFigures.length ? <ul className="content-list">{eraFigures.map((figure) => <FigureRow key={figure.id} figure={figure} locale={locale} onSelect={() => openFigure(figure.id)} />)}</ul>
+              {eraFigures.length ? <ul className="character-gallery">{eraFigures.map((figure) => <CharacterCard key={figure.id} figure={figure} locale={locale} eraLabel={eraText(selectedEra, "label", locale)} onSelect={() => openFigure(figure.id)} />)}</ul>
                 : <p className="empty-copy">{copy.noFigures}</p>}
             </section>
           </>}

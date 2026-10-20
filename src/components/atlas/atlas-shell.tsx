@@ -14,12 +14,16 @@ const MapCanvas = dynamic(
 
 type LoadState = "loading" | "ready" | "empty" | "error";
 
+function formatDisplayText(value: string) {
+  return value.replaceAll(" — ", ": ");
+}
+
 function SourceLinks({ ids }: { ids: string[] }) {
   return <ul className="source-list">{ids.map((id) => {
     const source = sources.find((item) => item.id === id);
     if (!source) return null;
     return <li key={id}>
-      <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} <span aria-hidden="true">↗</span></a>
+      <a href={source.url} target="_blank" rel="noopener noreferrer">{formatDisplayText(source.title)} <span aria-hidden="true">↗</span></a>
       <span>{source.license}{source.note ? ` · ${source.note}` : ""}</span>
     </li>;
   })}</ul>;
@@ -109,9 +113,9 @@ export function AtlasShell() {
 
   return <main className="atlas-shell">
     <header className="atlas-header">
-      <div className="brand-lockup" aria-label="TARIQ, исторический атлас Казахстана">
-        <span className="brand-mark" aria-hidden="true">T</span>
-        <div className="brand-text"><strong>TARIQ</strong><span>Исторический атлас Казахстана</span></div>
+      <div className="brand-lockup" aria-label="MURA, исторический атлас Казахстана">
+        <span className="brand-mark" aria-hidden="true">M</span>
+        <div className="brand-text"><strong>MURA</strong><span>Исторический атлас Казахстана</span></div>
       </div>
       <span className="header-status">Исторические реконструкции</span>
     </header>
@@ -147,7 +151,7 @@ export function AtlasShell() {
           <p className="detail-date">{activeEvent.properties.dateLabel?.ru}</p>
           <p className="detail-copy">{activeEvent.properties.description?.ru}</p>
           {activeEvent.properties.placeLabel && <p className="detail-fact"><strong>Место</strong>{activeEvent.properties.placeLabel.ru}</p>}
-          {activeEvent.properties.uncertaintyNote && <p className="detail-note"><strong>Точность датировки</strong>{activeEvent.properties.uncertaintyNote.ru}</p>}
+          {activeEvent.properties.uncertaintyNote && <p className="detail-note"><strong>Точность датировки</strong>{formatDisplayText(activeEvent.properties.uncertaintyNote.ru)}</p>}
           <p className="detail-note"><strong>На карте</strong>{activeEvent.properties.coordinateNote?.ru ?? "Надёжной координаты нет; маркер не показан."}</p>
           <div className="panel-divider" />
           <section className="panel-section" aria-labelledby="related-figures-title">
@@ -197,13 +201,13 @@ export function AtlasShell() {
           {selectedEra.kind === "historical-reconstruction" && <>
             <div className="panel-divider" />
             <section className="panel-section" aria-labelledby="highlights-title">
-              <div className="section-heading"><h2 id="highlights-title">Главное в эпохе</h2><span>{loadState === "ready" ? `${highlights.length} акцента` : "—"}</span></div>
+              <div className="section-heading"><h2 id="highlights-title">Главное в эпохе</h2>{loadState === "ready" && <span>{highlights.length} акцента</span>}</div>
               {loadState === "ready" && highlights.length ? <ol className="content-list highlight-list">{highlights.map((feature) => <EventRow key={feature.properties.id} feature={feature} onSelect={() => openEvent(feature.properties.id)} />)}</ol> : <p className="empty-copy">{loadState === "loading" ? "Загрузка событий…" : "Для периода нет выделенных событий."}</p>}
             </section>
           </>}
           <div className="panel-divider" />
           <section className="panel-section" aria-labelledby="event-title">
-            <div className="section-heading"><h2 id="event-title">События</h2><span>{loadState === "ready" ? events.length : "—"}</span></div>
+            <div className="section-heading"><h2 id="event-title">События</h2>{loadState === "ready" && <span>{events.length}</span>}</div>
             {loadState === "ready" && events.length ? <ul className="content-list">{events.map((feature) => <EventRow key={feature.properties.id} feature={feature} onSelect={() => openEvent(feature.properties.id)} />)}</ul>
               : <p className="empty-copy">{loadState === "loading" ? "Загрузка событий…"
                 : loadState === "error" ? "События не загрузились. Используйте кнопку повтора выше."

@@ -3,7 +3,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TARIQ | Исторический атлас Казахстана",
+  title: "MURA | Исторический атлас Казахстана",
   description: "Интерактивный исторический атлас Казахстана.",
 };
 

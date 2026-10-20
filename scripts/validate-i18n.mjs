@@ -17,6 +17,7 @@ function loadTypeScript(file) {
 const { eras, sources } = loadTypeScript("src/data/atlas.ts");
 const { figures } = loadTypeScript("src/data/figures.ts");
 const { ui } = loadTypeScript("src/data/ui-translations.ts");
+const { legal, legalOperator, legalContact, providerDocuments } = loadTypeScript("src/data/legal.ts");
 const { formatAccessDate } = loadTypeScript("src/lib/i18n/index.ts");
 const { eraTranslations, territoryTranslations, eventTranslations, figureDescriptionTranslations, sourceNoteTranslations, sourceTitleTranslations } =
   loadTypeScript("src/data/historical-translations.ts");
@@ -89,6 +90,27 @@ for (const locale of locales) {
     assert.ok(!value.includes("—"), `${locale}.${key} contains an em dash`);
     assert.deepEqual((value.match(/\{(?:name|era)\}/g) ?? []).sort(),
       (ui.ru[key].match(/\{(?:name|era)\}/g) ?? []).sort(), `${locale}.${key} placeholders differ`);
+  }
+}
+assert.equal(legalOperator, "Linux Team");
+assert.match(legalContact, /^[^@\s]+@[^@\s]+\.[^@\s]+$/);
+assert.deepEqual(Array.from(providerDocuments, (provider) => provider.id), ["google", "vercel", "openfreemap"]);
+for (const locale of locales) {
+  const copy = legal[locale];
+  for (const key of ["backToAtlas", "languageLabel", "privacyLink", "termsLink", "updated", "operator", "contact", "externalPolicies", "legalNavigation"]) {
+    assert.ok(copy[key]?.trim(), `${locale} legal ${key} is blank`);
+  }
+  for (const kind of ["privacy", "terms"]) {
+    const document = copy[kind];
+    assert.ok(document.title.trim() && document.intro.trim(), `${locale} ${kind} heading or intro is blank`);
+    assert.equal(document.sections.length, legal.ru[kind].sections.length, `${locale} ${kind} section count differs`);
+    document.sections.forEach((section, index) => {
+      assert.ok(section.heading.trim(), `${locale} ${kind} section ${index} heading is blank`);
+      assert.equal(section.paragraphs.length, legal.ru[kind].sections[index].paragraphs.length,
+        `${locale} ${kind} section ${index} paragraph count differs`);
+      assert.ok(section.paragraphs.every((paragraph) => paragraph.trim() && !paragraph.includes("—")),
+        `${locale} ${kind} section ${index} has blank copy or em dash`);
+    });
   }
 }
 assert.equal(formatAccessDate("kk", "2026-10-20"), "2026 жылғы 20 қазан", "Kazakh access date is malformed");

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { GuidePanel } from "./guide-panel";
 import { LearningPanel } from "./learning-panel";
@@ -7,6 +8,7 @@ import { MapCanvas } from "./map-canvas";
 import { eras, sources } from "@/data/atlas";
 import { figures } from "@/data/figures";
 import { ui } from "@/data/ui-translations";
+import { legal } from "@/data/legal";
 import { eraText, eventText, figureText, sourceNote, sourceTitle, territoryText } from "@/data/historical-translations";
 import type { EraDataset, EventFeature, HistoricalFigure } from "@/lib/atlas/types";
 import { validateEraData } from "@/lib/atlas/validate";
@@ -155,10 +157,10 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             <span className="timeline-dot" aria-hidden="true" /><span>{eraText(era, "label", locale)}</span>
           </button>)}
         </div>
-        <button type="button" className={`fixture-option${selectedId === "technical-fixture" ? " is-active" : ""}`}
+        {process.env.NODE_ENV === "development" && <button type="button" className={`fixture-option${selectedId === "technical-fixture" ? " is-active" : ""}`}
           aria-pressed={selectedId === "technical-fixture"} onClick={() => selectEra("technical-fixture")}>
           {copy.fixtureControl} <span aria-hidden="true">↗</span>
-        </button>
+        </button>}
       </nav>
       <section className="map-region" aria-label={copy.mapLabel}>
         <MapCanvas data={data} eraId={selectedId} locale={locale} onSelectEvent={openEvent} />
@@ -254,6 +256,10 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           {territorySource && <p>{copy.historicalPolygons} <a href={territorySource.url} target="_blank" rel="noopener noreferrer">{sourceTitle(territorySource.id, territorySource.title, locale)}</a>. {copy.license} <a href={territorySource.licenseUrl} target="_blank" rel="noopener noreferrer">{territorySource.license}</a>. {copy.coordinatesUnchanged} {formatAccessDate(locale, territorySource.accessedOn)}.</p>}
           <p>{copy.originalSourceTitles}</p>
           {locale !== "ru" && <p>{copy.translationReview}</p>}
+          <nav className="panel-legal-links" aria-label={legal[locale].legalNavigation}>
+            <Link href="/privacy">{legal[locale].privacyLink}</Link>
+            <Link href="/terms">{legal[locale].termsLink}</Link>
+          </nav>
         </div>
         </div>
         <GuidePanel key={`${selectedId}:${selectedEventId ?? ""}:${selectedFigureId ?? ""}:${locale}`}

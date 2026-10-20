@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { GuidePanel } from "./guide-panel";
+import { LearningPanel } from "./learning-panel";
 import { MapCanvas } from "./map-canvas";
 import { eras, sources } from "@/data/atlas";
 import { figures } from "@/data/figures";
@@ -60,7 +61,9 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [retry, setRetry] = useState(0);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [learningOpen, setLearningOpen] = useState(false);
   const closeGuide = useCallback(() => setGuideOpen(false), []);
+  const closeLearning = useCallback(() => setLearningOpen(false), []);
   const copy = ui[locale];
   const selectedEra = eras.find((era) => era.id === selectedId) ?? eras[0];
   const territorySource = sources.find((item) => item.id === "cliopatria-v021");
@@ -137,7 +140,9 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             aria-pressed={locale === option} onClick={() => setLocalePreference(option)}>{option.toUpperCase()}</button>)}
         </div>
         <button type="button" className="guide-trigger" aria-expanded={guideOpen} aria-controls="guide-title"
-          onClick={() => setGuideOpen((current) => !current)}>{copy.guideTrigger}</button>
+          onClick={() => { setLearningOpen(false); setGuideOpen((current) => !current); }}>{copy.guideTrigger}</button>
+        <button type="button" className="guide-trigger" aria-expanded={learningOpen} aria-controls="learn-title"
+          onClick={() => { setGuideOpen(false); setLearningOpen((current) => !current); }}>{copy.learnTrigger}</button>
       </div>
     </header>
     <div className="atlas-workspace">
@@ -164,8 +169,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         </div>}
         {selectedEra.kind === "technical-fixture" && <div className="map-fixture-label">{copy.fixtureMapLabel}</div>}
       </section>
-      <aside className={`atlas-panel${guideOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : "panel-title"}>
-        <div className="atlas-panel-content" hidden={guideOpen}>
+      <aside className={`atlas-panel${guideOpen || learningOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : "panel-title"}>
+        <div className="atlas-panel-content" hidden={guideOpen || learningOpen}>
         <div className="panel-overline">{activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
         {activeEvent ? <>
           <button className="back-link" type="button" onClick={() => setSelectedEventId(null)}>← {copy.backToPeriod} {eraText(selectedEra, "label", locale)}</button>
@@ -253,6 +258,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         </div>
         <GuidePanel key={`${selectedId}:${selectedEventId ?? ""}:${selectedFigureId ?? ""}:${locale}`}
           open={guideOpen} onClose={closeGuide} era={selectedEra} event={activeEvent} figure={activeFigure} loadState={loadState} locale={locale} />
+        <LearningPanel key={`${selectedId}:${selectedFigureId ?? ""}`} open={learningOpen} onClose={closeLearning}
+          era={selectedEra} figure={activeFigure} locale={locale} />
       </aside>
     </div>
   </main>;

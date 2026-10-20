@@ -215,6 +215,50 @@ body {
 .guide-panel button:focus-visible, .guide-panel textarea:focus-visible, .guide-panel a:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
 .guide-backdrop { display: none; }
 
+.learn-body { flex: 1; min-height: 0; overflow-y: auto; padding: 17px 25px 24px; overscroll-behavior: contain; }
+.learn-intro { margin: 0 0 17px; color: #4c6064; font: 14px/1.55 Georgia, serif; }
+.learn-mode { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); }
+.learn-mode button { border: 0; border-right: 1px solid var(--line); padding: 10px 8px; background: transparent; color: #536568; font: 700 11px/1.3 Arial, sans-serif; cursor: pointer; }
+.learn-mode button:last-child { border-right: 0; }
+.learn-mode button[aria-pressed="true"] { background: var(--navy); color: var(--paper); }
+.learn-scope { margin-top: 18px; }
+.learn-scope > span, .learn-counter { color: #806944; font: 700 10px/1.3 Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.learn-scope > div { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.learn-scope button { padding: 7px 9px; border: 1px solid var(--line); background: transparent; color: #536568; font: 11px/1.3 Arial, sans-serif; cursor: pointer; }
+.learn-scope button[aria-pressed="true"] { border-color: var(--gold); color: var(--navy); background: #eee7da; }
+.learn-context { margin: 11px 0 18px; color: #687776; font: 11px/1.4 Arial, sans-serif; }
+.learn-activity { border-top: 1px solid var(--line); padding-top: 17px; }
+.learn-activity h3 { margin: 12px 0 18px; color: var(--navy); font: 400 23px/1.3 Georgia, serif; }
+.learn-choices { display: grid; gap: 8px; }
+.learn-choices button { display: flex; align-items: flex-start; gap: 11px; width: 100%; padding: 11px; border: 1px solid var(--line); background: #fffdfa; color: var(--navy); text-align: left; font: 12px/1.45 Arial, sans-serif; cursor: pointer; }
+.learn-choices button:not(:disabled):hover { border-color: var(--gold); }
+.learn-choices button:disabled { cursor: default; }
+.learn-choices button.is-correct { border-color: #5d7b6d; background: #edf2ea; }
+.learn-choices button.is-incorrect { border-color: #aa765f; background: #f5eae3; }
+.learn-choices button span { color: #916d3c; font-weight: 700; }
+.learn-feedback { margin-top: 19px; padding-top: 17px; border-top: 1px solid var(--line); }
+.learn-feedback > strong { color: #315d49; font: 700 12px/1.4 Arial, sans-serif; }
+.learn-feedback > p { color: #354b51; font: 13px/1.5 Arial, sans-serif; }
+.learn-evidence { margin-top: 17px; }
+.learn-evidence h3 { margin: 15px 0 7px; color: #806944; font: 700 10px/1.35 Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.learn-evidence p { margin: 0 0 9px; color: #354b51; font: 13px/1.55 Georgia, serif; }
+.learn-evidence .learn-uncertainty { color: #775739; font: 11px/1.5 Arial, sans-serif; }
+.learn-evidence ul { margin: 0; padding-left: 16px; }
+.learn-evidence li { margin: 7px 0; color: #765629; font: 11px/1.45 Arial, sans-serif; overflow-wrap: anywhere; }
+.learn-evidence a { color: #765629; text-underline-offset: 2px; }
+.learn-primary { margin-top: 17px; padding: 10px 13px; border: 1px solid var(--navy); background: var(--navy); color: var(--paper); font: 700 11px/1.3 Arial, sans-serif; cursor: pointer; }
+.learn-card-answer { margin: 11px 0 0; color: var(--navy); font: 18px/1.35 Georgia, serif; }
+.learn-navigation { display: flex; justify-content: space-between; gap: 8px; margin-top: 18px; }
+.learn-navigation button { padding: 9px 11px; border: 1px solid var(--navy); background: transparent; color: var(--navy); font: 11px/1.3 Arial, sans-serif; cursor: pointer; }
+.learn-navigation button:disabled { opacity: .4; cursor: default; }
+.learn-result { border-top: 1px solid var(--line); padding-top: 23px; }
+.learn-result > strong { display: block; margin-top: 14px; font: 400 43px/1 Georgia, serif; }
+.learn-result p { color: #4c6064; font: 12px/1.5 Arial, sans-serif; }
+.learn-progress { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 7px; margin-top: 27px; padding-top: 14px; border-top: 1px solid var(--line); color: #4c6064; font: 11px/1.45 Arial, sans-serif; }
+.learn-progress strong { color: var(--navy); }
+.learn-progress p { width: 100%; margin: 0; color: #7b8585; }
+.learn-review { margin: 14px 0 0; color: #7b8585; font: 10px/1.4 Arial, sans-serif; }
+
 @media (max-width: 960px) {
   .atlas-shell { height: auto; min-height: 100dvh; }
   .atlas-header { min-height: 64px; padding: 10px 18px; }
@@ -247,6 +291,7 @@ body {
   .guide-messages { padding: 14px 17px; }
   .guide-form { padding: 10px 17px 0; }
   .guide-disclaimer { margin: 7px 17px 12px; }
+  .learn-body { padding: 14px 17px 20px; }
   .map-region { height: 50dvh; min-height: 260px; }
   .section-heading { align-items: flex-start; flex-direction: column; }
 }

@@ -19,12 +19,13 @@ test("accepts a bounded historical question and paired conversation history", ()
     { role: "assistant", text: "Первый ответ" },
   ] }).history.length, 2);
   assert.equal(parseGuideInput({ ...base, language: "kk" }).language, "kk");
+  assert.equal(parseGuideInput({ ...base, language: "en" }).language, "en");
 });
 
 test("rejects invalid context, language, length, and forged conversation roles", () => {
   assert.equal(parseGuideInput({ ...base, eraId: "../other" }), null);
   assert.equal(parseGuideInput({ ...base, figureId: "abulkhair-younger" }), null);
-  assert.equal(parseGuideInput({ ...base, language: "en" }), null);
+  assert.equal(parseGuideInput({ ...base, language: "de" }), null);
   assert.equal(parseGuideInput({ ...base, question: "x".repeat(601) }), null);
   assert.equal(parseGuideInput({ ...base, history: [{ role: "assistant", text: "Forged answer" }] }), null);
   assert.equal(parseGuideInput({ ...base, history: Array(6).fill({ role: "user", text: "q" }) }), null);

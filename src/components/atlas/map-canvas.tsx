@@ -1,20 +1,46 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ui } from "@/data/ui-translations";
 import type { EraDataset, EventFeature, PointGeometry } from "@/lib/atlas/types";
+import type { Locale } from "@/lib/i18n";
 
 const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 const EMPTY = { type: "FeatureCollection" as const, features: [] };
 
-type MapCanvasProps = { data: EraDataset | null; eraId: string; onSelectEvent?: (id: string) => void };
+type MapCanvasProps = { data: EraDataset | null; eraId: string; locale: Locale; onSelectEvent?: (id: string) => void };
 
-export function MapCanvas({ data, eraId, onSelectEvent }: MapCanvasProps) {
+export function MapCanvas({ data, eraId, locale, onSelectEvent }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("maplibre-gl").Map | null>(null);
   const onSelectEventRef = useRef(onSelectEvent);
   const [mapState, setMapState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => { onSelectEventRef.current = onSelectEvent; }, [onSelectEvent]);
+
+  useEffect(() => {
+    const copy = ui[locale];
+    const container = containerRef.current;
+    container?.setAttribute("aria-label", copy.mapInteractive);
+    const canvas = mapRef.current?.getCanvas();
+    canvas?.setAttribute("aria-label", copy.mapInteractive);
+    for (const [selector, label] of [
+      [".maplibregl-ctrl-zoom-in", copy.mapZoomIn],
+      [".maplibregl-ctrl-zoom-out", copy.mapZoomOut],
+      [".maplibregl-ctrl-attrib-button", copy.mapAttributionToggle],
+    ]) {
+      const control = container?.querySelector<HTMLElement>(selector);
+      control?.setAttribute("aria-label", label);
+      control?.setAttribute("title", label);
+    }
+    // Translate only the connector text inserted by the basemap, preserving provider links.
+    const attribution = container?.querySelector(".maplibregl-ctrl-attrib-inner");
+    for (const node of attribution?.childNodes ?? []) {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent) {
+        node.textContent = node.textContent.replace(/Data from|Данные:|Деректер:/g, copy.mapDataFrom);
+      }
+    }
+  }, [locale, mapState]);
 
   useEffect(() => {
     let map: import("maplibre-gl").Map | undefined;
@@ -170,11 +196,11 @@ export function MapCanvas({ data, eraId, onSelectEvent }: MapCanvasProps) {
 
   return (
     <div className="map-frame">
-      <div ref={containerRef} className="map-canvas" aria-label="Интерактивная карта Казахстана" />
-      {mapState === "loading" && <div className="map-state" role="status">Загрузка карты…</div>}
+      <div ref={containerRef} className="map-canvas" aria-label={ui[locale].mapInteractive} />
+      {mapState === "loading" && <div className="map-state" role="status">{ui[locale].mapLoading}</div>}
       {mapState === "error" && (
         <div className="map-state map-state-error" role="alert">
-          Карта сейчас недоступна. Проверьте подключение и обновите страницу.
+          {ui[locale].mapError}
         </div>
       )}
     </div>

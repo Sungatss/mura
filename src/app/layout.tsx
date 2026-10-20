@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
+import { ui } from "@/data/ui-translations";
+import { requestLocale } from "@/lib/i18n/server";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "MURA | Исторический атлас Казахстана",
-  description: "Интерактивный исторический атлас Казахстана.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const copy = ui[await requestLocale()];
+  return { title: `MURA | ${copy.brandSubtitle}`, description: copy.atlasIntro };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru">
+    <html lang={await requestLocale()}>
       <body>{children}</body>
     </html>
   );

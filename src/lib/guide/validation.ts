@@ -1,4 +1,4 @@
-export type GuideLanguage = "ru" | "kk";
+export type GuideLanguage = "ru" | "kk" | "en";
 export type GuideTurn = { role: "user" | "assistant"; text: string };
 export type GuideInput = {
   eraId: string;
@@ -25,7 +25,7 @@ export function parseGuideInput(value: unknown): GuideInput | null {
     || (value.eventId != null && !validId(value.eventId))
     || (value.figureId != null && !validId(value.figureId))
     || (value.eventId != null && value.figureId != null)
-    || (value.language !== "ru" && value.language !== "kk")
+    || (value.language !== "ru" && value.language !== "kk" && value.language !== "en")
     || typeof value.question !== "string"
     || value.question.trim().length < 3
     || value.question.length > MAX_QUESTION_LENGTH) return null;

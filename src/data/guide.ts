@@ -1,13 +1,9 @@
-import type { GuideLanguage } from "@/lib/guide/validation";
+import { ui } from "@/data/ui-translations";
+import type { Locale } from "@/lib/i18n";
 
-export function guideSuggestions(language: GuideLanguage, eraLabel: string, eventName?: string, figureName?: string): string[] {
-  if (eventName) return language === "kk"
-    ? [`«${eventName}» оқиғасы туралы деректер не дейді?`, "Бұл оқиғаның мерзімі мен орны қаншалықты анық?"]
-    : [`Что источники сообщают о событии «${eventName}»?`, "Насколько точно известны дата и место этого события?"];
-  if (figureName) return language === "kk"
-    ? [`${figureName} туралы деректер не дейді?`, "Бұл тұлға қандай оқиғалармен байланысты?"]
-    : [`Что источники сообщают о персоне ${figureName}?`, "С какими событиями связан этот человек?"];
-  return language === "kk"
-    ? [`${eraLabel} кезеңінің қандай оқиғалары белгілі?`, "Бұл кезеңдегі аумақ шекарасы қаншалықты анық?"]
-    : [`Какие события известны для периода ${eraLabel}?`, "Насколько точна реконструкция территории этого периода?"];
+export function guideSuggestions(locale: Locale, eraLabel: string, eventName?: string, figureName?: string): string[] {
+  const copy = ui[locale];
+  if (eventName) return [copy.guideEventSuggestion.replace("{name}", eventName), copy.guideEventPrecisionSuggestion];
+  if (figureName) return [copy.guideFigureSuggestion.replace("{name}", figureName), copy.guideFigureEventsSuggestion];
+  return [copy.guideEraSuggestion.replace("{era}", eraLabel), copy.guideEraBoundarySuggestion];
 }

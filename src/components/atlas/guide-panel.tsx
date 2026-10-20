@@ -2,9 +2,12 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { guideSuggestions } from "@/data/guide";
+import { ui } from "@/data/ui-translations";
+import { eraText, eventText, figureText, sourceTitle } from "@/data/historical-translations";
 import type { Era, EventFeature, HistoricalFigure } from "@/lib/atlas/types";
-import type { GuideLanguage, GuideTurn } from "@/lib/guide/validation";
+import type { GuideTurn } from "@/lib/guide/validation";
 import { MAX_QUESTION_LENGTH } from "@/lib/guide/validation";
+import type { Locale } from "@/lib/i18n";
 
 type Citation = { id: string; title: string; url: string };
 type Message = { role: "user" | "assistant"; text: string; citations?: Citation[]; supported?: boolean };
@@ -16,20 +19,10 @@ type GuidePanelProps = {
   event?: EventFeature;
   figure?: HistoricalFigure;
   loadState: "loading" | "ready" | "empty" | "error";
+  locale: Locale;
 };
 
-const ERROR_TEXT: Record<string, string> = {
-  MISSING_API_KEY: "Гид пока не настроен. Администратору нужно добавить GEMINI_API_KEY на сервере.",
-  RATE_LIMITED: "Слишком много запросов. Подождите минуту и повторите.",
-  PROVIDER_RATE_LIMITED: "Gemini временно ограничил запросы. Повторите позже.",
-  PROVIDER_TIMEOUT: "Ответ занимает слишком много времени. Попробуйте ещё раз.",
-  DATA_UNAVAILABLE: "Исторические данные сейчас недоступны. Попробуйте ещё раз позже.",
-  INVALID_PROVIDER_RESPONSE: "Не удалось проверить ответ и ссылки. Повторите запрос.",
-  PROVIDER_UNAVAILABLE: "Gemini сейчас недоступен. Повторите запрос позже.",
-};
-
-export function GuidePanel({ open, onClose, era, event, figure, loadState }: GuidePanelProps) {
-  const [language, setLanguage] = useState<GuideLanguage>("ru");
+export function GuidePanel({ open, onClose, era, event, figure, loadState, locale }: GuidePanelProps) {
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [pending, setPending] = useState(false);
@@ -40,7 +33,19 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState }: Gui
   const listRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<AbortController | null>(null);
   const available = era.kind === "historical-reconstruction" && loadState === "ready";
-  const suggestions = guideSuggestions(language, era.label.ru, event?.properties.name.ru, figure?.name.ru);
+  const copy = ui[locale];
+  const suggestions = guideSuggestions(locale, eraText(era, "label", locale),
+    event ? eventText(event.properties, "name", locale) : undefined,
+    figure ? figureText(figure, "name", locale) : undefined);
+  const errors: Record<string, string> = {
+    MISSING_API_KEY: copy.guideErrorMissingKey,
+    RATE_LIMITED: copy.guideErrorRateLimit,
+    PROVIDER_RATE_LIMITED: copy.guideErrorProviderRateLimit,
+    PROVIDER_TIMEOUT: copy.guideErrorTimeout,
+    DATA_UNAVAILABLE: copy.guideErrorData,
+    INVALID_PROVIDER_RESPONSE: copy.guideErrorInvalidResponse,
+    PROVIDER_UNAVAILABLE: copy.guideErrorProvider,
+  };
 
   useEffect(() => {
     const query = window.matchMedia("(max-width: 960px)");
@@ -89,16 +94,6 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState }: Gui
 
   if (!open) return null;
 
-  function changeLanguage(next: GuideLanguage) {
-    if (next === language) return;
-    controllerRef.current?.abort();
-    setLanguage(next);
-    setMessages([]);
-    setErrorCode(null);
-    setRetryQuestion(null);
-    setPending(false);
-  }
-
   async function ask(question: string, previous?: PendingQuestion) {
     const cleaned = question.trim();
     if (!available || pending || cleaned.length < 3 || cleaned.length > MAX_QUESTION_LENGTH) return;
@@ -120,7 +115,7 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState }: Gui
           eraId: era.id,
           eventId: event?.properties.id ?? null,
           figureId: figure?.id ?? null,
-          language,
+          language: locale,
           question: cleaned,
           history,
         }),
@@ -151,55 +146,49 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState }: Gui
   }
 
   return <>
-    {isMobile && <button className="guide-backdrop" type="button" tabIndex={-1} aria-label="Закрыть исторического гида" onClick={onClose} />}
+    {isMobile && <button className="guide-backdrop" type="button" tabIndex={-1} aria-label={copy.guideCloseLabel} onClick={onClose} />}
     <section ref={panelRef} className="guide-panel" role={isMobile ? "dialog" : "region"}
       aria-modal={isMobile ? true : undefined} aria-labelledby="guide-title">
       <div className="guide-top">
-        <div><span className="panel-overline">MURA / Источники и контекст</span><h2 id="guide-title">Исторический гид</h2></div>
-        <button type="button" className="guide-close" onClick={onClose} aria-label="Закрыть гида">Закрыть</button>
+        <div><span className="panel-overline">{copy.guideOverline}</span><h2 id="guide-title">{copy.guideTitle}</h2></div>
+        <button type="button" className="guide-close" onClick={onClose} aria-label={copy.guideCloseLabel}>{copy.guideClose}</button>
       </div>
-      <p className="guide-context">{era.label.ru}{event ? ` / ${event.properties.name.ru}` : figure ? ` / ${figure.name.ru}` : ""}</p>
-      <div className="guide-language" role="group" aria-label="Язык ответа">
-        <button type="button" aria-pressed={language === "ru"} onClick={() => changeLanguage("ru")}>Русский</button>
-        <button type="button" aria-pressed={language === "kk"} onClick={() => changeLanguage("kk")}>Қазақша</button>
-      </div>
-      <div className="guide-messages" ref={listRef} role="log" aria-label="Разговор с историческим гидом" aria-live="polite">
+      <p className="guide-context">{eraText(era, "label", locale)}{event ? ` / ${eventText(event.properties, "name", locale)}` : figure ? ` / ${figureText(figure, "name", locale)}` : ""}</p>
+      <div className="guide-messages" ref={listRef} role="log" aria-label={copy.guideLog} aria-live="polite">
         {!available && <p className="guide-empty">{era.kind === "technical-fixture"
-          ? "Технический слой не содержит исторических данных для ответа."
-          : loadState === "loading" ? "Загрузка исторических данных…"
-            : loadState === "error" ? "Исторические данные не загрузились. Повторите загрузку в атласе."
-              : "Для этого периода нет данных, на которые можно опереться."}</p>}
+          ? copy.guideEmptyFixture
+          : loadState === "loading" ? copy.guideEmptyLoading
+            : loadState === "error" ? copy.guideEmptyError
+              : copy.guideEmptyData}</p>}
         {available && messages.length === 0 && <div className="guide-intro">
-          <p>Задайте вопрос об этом периоде. Ответ опирается только на материалы атласа и показывает использованные источники.</p>
+          <p>{copy.guideIntro}</p>
           <div className="guide-suggestions">{suggestions.map((question) => <button type="button" key={question} onClick={() => void ask(question)}>{question}</button>)}</div>
         </div>}
         {messages.map((message, index) => <article key={index} className={`guide-message guide-message-${message.role}`}>
-          <span className="guide-message-label">{message.role === "user" ? "Вы" : "MURA"}</span>
+          <span className="guide-message-label">{message.role === "user" ? copy.guideYou : "MURA"}</span>
           <p>{message.text}</p>
           {message.citations && message.citations.length > 0 && <div className="guide-citations">
-            <strong>Источники</strong>
+            <strong>{copy.sources}</strong>
             <ul>{message.citations.map((citation) => <li key={citation.id}>
-              <a href={citation.url} target="_blank" rel="noopener noreferrer">{citation.title.replaceAll(" — ", ": ")} <span aria-hidden="true">↗</span></a>
+              <a href={citation.url} target="_blank" rel="noopener noreferrer" title={citation.title}>{sourceTitle(citation.id, citation.title, locale).replaceAll(" — ", ": ")} <span aria-hidden="true">↗</span></a>
             </li>)}</ul>
           </div>}
-          {message.role === "assistant" && !message.supported && <span className="guide-uncertainty">Недостаточно подтверждённых данных</span>}
+          {message.role === "assistant" && !message.supported && <span className="guide-uncertainty">{copy.guideUncertainty}</span>}
         </article>)}
-        {pending && <p className="guide-pending" role="status">Гид проверяет материалы периода…</p>}
+        {pending && <p className="guide-pending" role="status">{copy.guidePending}</p>}
         {errorCode && <div className="guide-error" role="alert">
-          <p>{ERROR_TEXT[errorCode] ?? "Не удалось получить ответ. Попробуйте ещё раз."}</p>
-          {retryQuestion && <button type="button" onClick={() => void ask(retryQuestion.question, retryQuestion)}>Повторить вопрос</button>}
+          <p>{errors[errorCode] ?? copy.guideErrorDefault}</p>
+          {retryQuestion && <button type="button" onClick={() => void ask(retryQuestion.question, retryQuestion)}>{copy.guideRetry}</button>}
         </div>}
       </div>
       <form className="guide-form" onSubmit={submit}>
-        <label htmlFor="guide-question">Ваш вопрос</label>
+        <label htmlFor="guide-question">{copy.guideQuestion}</label>
         <textarea id="guide-question" rows={2} maxLength={MAX_QUESTION_LENGTH} value={draft}
           onChange={(event) => setDraft(event.target.value)} disabled={!available || pending}
-          placeholder="Спросите о событиях, людях или точности карты" />
-        <button type="submit" disabled={!available || pending || draft.trim().length < 3}>Отправить</button>
+          placeholder={copy.guidePlaceholder} />
+        <button type="submit" disabled={!available || pending || draft.trim().length < 3}>{copy.guideSend}</button>
       </form>
-      <p className="guide-disclaimer">{language === "kk"
-        ? "Қазақша жауап орыс тіліндегі тексерілген қысқаша деректер негізінде жасалады. Түпнұсқа дереккөздерді тексеріңіз."
-        : "Ответ сформирован по кратким проверенным материалам атласа. Для деталей откройте источники."}</p>
+      <p className="guide-disclaimer">{copy.guideDisclaimer}{locale !== "ru" ? ` ${copy.translationReview}` : ""} {copy.originalSourceTitles}</p>
     </section>
   </>;
 }

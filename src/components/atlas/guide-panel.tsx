@@ -146,8 +146,8 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState, local
   }
 
   return <>
-    {isMobile && open && <button className="guide-backdrop" type="button" tabIndex={-1} aria-label={copy.guideCloseLabel} onClick={onClose} />}
-    <section ref={panelRef} className={`guide-panel${open ? " is-open" : ""}`} role="dialog" inert={!open}
+    {isMobile && open && <button className="guide-backdrop guide-chat-backdrop" type="button" tabIndex={-1} aria-label={copy.guideCloseLabel} onClick={onClose} />}
+    <section ref={panelRef} className={`guide-panel guide-chat-panel${open ? " is-open" : ""}`} role="dialog" inert={!open}
       aria-hidden={!open} aria-modal={isMobile ? true : undefined} aria-labelledby="guide-title">
       <div className="guide-top">
         <div className="guide-identity"><Image src="/images/guide-avatar.png" alt="" width={54} height={54} sizes="54px" />

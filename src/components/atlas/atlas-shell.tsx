@@ -652,7 +652,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     </div>
     <GuidePanel key={`${selectedId}:${selectedEventId ?? ""}:${selectedFigureId ?? ""}:${locale}`}
       open={guideOpen} onClose={closeGuide} era={selectedEra} event={activeEvent} figure={activeFigure} loadState={loadState} locale={locale} />
-    <button type="button" className="guide-launcher" aria-expanded={guideOpen} aria-controls="guide-title"
+    <button type="button" className={`guide-launcher${learningOpen || shezhireOpen ? " is-obscured" : ""}`} aria-expanded={guideOpen} aria-controls="guide-title"
       aria-label={copy.guideTrigger} onClick={() => { setLearningOpen(false); setShezhireOpen(false); setGuideOpen((current) => !current); }}>
       <span className="guide-launcher-image"><Image src="/images/guide-avatar.png" alt="" width={80} height={80} sizes="80px" priority /></span>
       <span className="guide-launcher-label">{copy.guideTrigger}</span>

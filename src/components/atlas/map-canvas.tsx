@@ -32,16 +32,24 @@ type MapCanvasProps = {
   locale: Locale;
   categoryFilter: EventCategory | "all";
   selectedEventId: string | null;
+  compareEnabled: boolean;
+  compareData: EraDataset | null;
+  compareEraId: string;
+  compareBalance: number;
   onSelectEvent?: (id: string) => void;
 };
 
-export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId, onSelectEvent }: MapCanvasProps) {
+export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId, compareEnabled, compareData, compareEraId, compareBalance, onSelectEvent }: MapCanvasProps) {
   const { theme } = useTheme();
   const themeRef = useRef(theme);
   const lastFitData = useRef<EraDataset | null>(null);
+  const lastFitCompareData = useRef<EraDataset | null>(null);
+  const lastFitCompareEnabled = useRef(false);
   const lastFitSize = useRef("");
   const lastAppliedSource = useRef<import("maplibre-gl").GeoJSONSource | null>(null);
   const lastAppliedData = useRef<EraDataset | null>(null);
+  const lastAppliedCompareSource = useRef<import("maplibre-gl").GeoJSONSource | null>(null);
+  const lastAppliedCompareData = useRef<EraDataset | null>(null);
   const markersRef = useRef(new Map<string, import("maplibre-gl").Marker>());
   const maplibreRef = useRef<typeof import("maplibre-gl") | null>(null);
   const [mapRevision, setMapRevision] = useState(0);
@@ -124,17 +132,30 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
         map.on("style.load", () => {
           if (cancelled || !map) return;
           map.addSource("atlas-territories", { type: "geojson", data: EMPTY });
+          map.addSource("atlas-compare-territories", { type: "geojson", data: EMPTY });
           map.addLayer({
             id: "atlas-territory-fill",
             type: "fill",
             source: "atlas-territories",
-            paint: { "fill-color": "#b3894d", "fill-opacity": 0.28 },
+            paint: { "fill-color": "#b3894d", "fill-opacity": 0.28, "fill-opacity-transition": { duration: 200 } },
+          });
+          map.addLayer({
+            id: "atlas-compare-fill",
+            type: "fill",
+            source: "atlas-compare-territories",
+            paint: { "fill-color": "#347f89", "fill-opacity": 0, "fill-opacity-transition": { duration: 200 } },
           });
           map.addLayer({
             id: "atlas-territory-outline",
             type: "line",
             source: "atlas-territories",
             paint: { "line-color": themeRef.current === "dark" ? "#d4b67e" : "#745629", "line-width": 2 },
+          });
+          map.addLayer({
+            id: "atlas-compare-outline",
+            type: "line",
+            source: "atlas-compare-territories",
+            paint: { "line-color": themeRef.current === "dark" ? "#7cc6c8" : "#176574", "line-width": 2.4, "line-opacity": 0 },
           });
           setMapRevision((value) => value + 1);
           setMapState("ready");
@@ -171,6 +192,7 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
     const loadedTheme = themeRef.current;
     const viewportSize = `${containerRef.current?.clientWidth}:${containerRef.current?.clientHeight}`;
     const territories = map.getSource("atlas-territories") as import("maplibre-gl").GeoJSONSource;
+    const compareTerritories = map.getSource("atlas-compare-territories") as import("maplibre-gl").GeoJSONSource | undefined;
     if (territories !== lastAppliedSource.current || data !== lastAppliedData.current) {
       lastAppliedSource.current = territories;
       lastAppliedData.current = data;
@@ -188,10 +210,28 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
         }
       });
     }
-    if (data && !selectedEventId && (data !== lastFitData.current || viewportSize !== lastFitSize.current)
+    if (compareTerritories && (compareTerritories !== lastAppliedCompareSource.current || (compareEnabled ? compareData : null) !== lastAppliedCompareData.current)) {
+      lastAppliedCompareSource.current = compareTerritories;
+      lastAppliedCompareData.current = compareEnabled ? compareData : null;
+      if (containerRef.current) delete containerRef.current.dataset.loadedCompareEra;
+      void compareTerritories.setData(compareEnabled ? compareData?.territories ?? EMPTY : EMPTY).then(() => {
+        if (compareEnabled && compareData && mapRef.current?.getSource("atlas-compare-territories") === compareTerritories
+          && lastAppliedCompareData.current === compareData && containerRef.current) {
+          containerRef.current.dataset.loadedCompareEra = compareEraId;
+        }
+      }).catch((error) => {
+        if (mapRef.current?.getSource("atlas-compare-territories") === compareTerritories) {
+          console.error("Comparison layer could not update", error);
+          setMapState("error");
+        }
+      });
+    }
+    if (data && (!compareEnabled || compareData) && !selectedEventId
+      && (data !== lastFitData.current || (compareEnabled ? compareData : null) !== lastFitCompareData.current
+        || compareEnabled !== lastFitCompareEnabled.current || viewportSize !== lastFitSize.current)
       && (data.territories.features.length || data.events.features.some((feature) => locatedEvent(feature, eraId)))) {
       const bounds = { west: 180, south: 90, east: -180, north: -90 };
-      for (const feature of data.territories.features) {
+      for (const feature of [...data.territories.features, ...(compareEnabled ? compareData?.territories.features ?? [] : [])]) {
         const polygons = feature.geometry.type === "Polygon"
           ? [feature.geometry.coordinates] : feature.geometry.coordinates;
         for (const polygon of polygons) {
@@ -205,7 +245,7 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
           }
         }
       }
-      for (const feature of data.events.features) {
+      for (const feature of compareEnabled ? [] : data.events.features) {
         if (locatedEvent(feature, eraId)) {
           const [lng, lat] = feature.geometry.coordinates;
           bounds.west = Math.min(bounds.west, lng);
@@ -215,6 +255,8 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
         }
       }
       lastFitData.current = data;
+      lastFitCompareData.current = compareEnabled ? compareData : null;
+      lastFitCompareEnabled.current = compareEnabled;
       lastFitSize.current = viewportSize;
       map.fitBounds(
         [[bounds.west, bounds.south], [bounds.east, bounds.north]],
@@ -225,7 +267,22 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
         },
       );
     }
-  }, [data, eraId, mapState, mapRevision, selectedEventId]);
+  }, [data, eraId, mapState, mapRevision, selectedEventId, compareEnabled, compareData, compareEraId]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map?.getLayer("atlas-compare-fill")) return;
+    const share = compareBalance / 100;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    map.setPaintProperty("atlas-territory-fill", "fill-color", compareEnabled ? "#bc873d" : "#b3894d");
+    map.setPaintProperty("atlas-territory-fill", "fill-opacity-transition", { duration: reducedMotion ? 0 : 200 });
+    map.setPaintProperty("atlas-territory-fill", "fill-opacity", compareEnabled ? 0.18 + 0.25 * (1 - share) : selectedEventId ? 0.37 : 0.28);
+    map.setPaintProperty("atlas-territory-outline", "line-color", compareEnabled ? (theme === "dark" ? "#e5ba73" : "#89591c") : (theme === "dark" ? "#d4b67e" : "#745629"));
+    map.setPaintProperty("atlas-territory-outline", "line-width", compareEnabled ? 2.5 : selectedEventId ? 3.5 : 2);
+    map.setPaintProperty("atlas-compare-fill", "fill-opacity-transition", { duration: reducedMotion ? 0 : 200 });
+    map.setPaintProperty("atlas-compare-fill", "fill-opacity", compareEnabled ? 0.18 + 0.25 * share : 0);
+    map.setPaintProperty("atlas-compare-outline", "line-opacity", compareEnabled ? 1 : 0);
+  }, [compareEnabled, compareBalance, selectedEventId, theme, mapRevision]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -235,7 +292,7 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
     for (const marker of markers.values()) marker.remove();
     markers.clear();
     const copy = ui[locale];
-    for (const feature of data?.events.features ?? []) {
+    for (const feature of compareEnabled ? [] : data?.events.features ?? []) {
       if (!locatedEvent(feature, eraId)) continue;
       const category = eventCategory(feature.properties.id);
       if (categoryFilter !== "all" && category !== categoryFilter) continue;
@@ -269,23 +326,16 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
       for (const marker of markers.values()) marker.remove();
       markers.clear();
     };
-  }, [data, eraId, locale, categoryFilter, mapState]);
+  }, [data, eraId, locale, categoryFilter, mapState, compareEnabled]);
 
   useEffect(() => {
     for (const [id, marker] of markersRef.current) {
       marker.getElement().classList.toggle("is-selected", id === selectedEventId);
     }
-    const map = mapRef.current;
-    if (map?.getLayer("atlas-territory-fill")) {
-      map.setPaintProperty("atlas-territory-fill", "fill-opacity", selectedEventId ? 0.37 : 0.28);
-    }
-    if (map?.getLayer("atlas-territory-outline")) {
-      map.setPaintProperty("atlas-territory-outline", "line-width", selectedEventId ? 3.5 : 2);
-    }
   }, [selectedEventId, mapRevision, data, categoryFilter, locale]);
 
   useEffect(() => {
-    if (!selectedEventId || !data || mapState !== "ready") return;
+    if (!selectedEventId || !data || mapState !== "ready" || compareEnabled) return;
     const feature = data.events.features.find((item) => item.properties.id === selectedEventId);
     if (!feature || !locatedEvent(feature, eraId)) return;
     const map = mapRef.current;
@@ -296,7 +346,7 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
       duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 850,
       essential: false,
     });
-  }, [selectedEventId, data, eraId, mapState]);
+  }, [selectedEventId, data, eraId, mapState, compareEnabled]);
 
   return (
     <div className="map-frame">

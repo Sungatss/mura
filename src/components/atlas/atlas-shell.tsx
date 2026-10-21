@@ -16,7 +16,7 @@ import { figureSignificance } from "@/data/figure-profiles";
 import { ui } from "@/data/ui-translations";
 import { legal } from "@/data/legal";
 import { eraText, eventText, figureText, sourceNote, sourceTitle, territoryText } from "@/data/historical-translations";
-import type { EraDataset, EventFeature, HistoricalFigure } from "@/lib/atlas/types";
+import type { Era, EraDataset, EventFeature, HistoricalFigure } from "@/lib/atlas/types";
 import { validateEraData } from "@/lib/atlas/validate";
 import { formatAccessDate, formatCount, type Locale } from "@/lib/i18n";
 import { setLocalePreference, useLocale } from "@/lib/i18n/store";
@@ -76,6 +76,24 @@ function CharacterCard({ figure, locale, eraLabel, onSelect }: { figure: Histori
   </button></li>;
 }
 
+function CompareEraSummary({ era, data, status, locale, onExplore, tone }: {
+  era: Era; data: EraDataset | null; status: LoadState; locale: Locale; onExplore: () => void; tone: "first" | "second";
+}) {
+  const copy = ui[locale];
+  const highlights = data?.events.features.filter((feature) => feature.properties.highlightRank != null && feature.properties.sourceIds.length)
+    .sort((a, b) => (a.properties.highlightRank ?? 0) - (b.properties.highlightRank ?? 0)).slice(0, 3) ?? [];
+  return <section className={`compare-era compare-era-${tone}`}>
+    <div className="compare-era-heading"><span className="compare-swatch" aria-hidden="true" /><div><span>{tone === "first" ? copy.compareFirst : copy.compareSecond}</span><h2>{eraText(era, "label", locale)}</h2></div></div>
+    <p>{eraText(era, "description", locale)}</p>
+    {data ? highlights.length ? <ol className="compare-highlights">{highlights.map((feature) => {
+      const source = sources.find((item) => feature.properties.sourceIds.includes(item.id));
+      return <li key={feature.properties.id}><span>{eventText(feature.properties, "dateLabel", locale)}</span><strong>{eventText(feature.properties, "name", locale)}</strong>
+        {source && <a href={source.url} target="_blank" rel="noopener noreferrer">{sourceTitle(source.id, source.title, locale)} ↗</a>}</li>;
+    })}</ol> : <p className="empty-copy">{copy.compareNoHighlights}</p> : <p className="data-message" role="status">{status === "error" ? copy.dataError : status === "empty" ? copy.noData : copy.compareLoading}</p>}
+    <button type="button" className="compare-explore" onClick={onExplore}>{copy.compareExplore} <span aria-hidden="true">↗</span></button>
+  </section>;
+}
+
 export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const locale = useLocale(initialLocale);
   const [selectedId, setSelectedId] = useState(eras[0].id);
@@ -84,6 +102,12 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const [selectedFigureId, setSelectedFigureId] = useState<string | null>(null);
   const [closingFigureId, setClosingFigureId] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<EventCategory | "all">("all");
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [compareId, setCompareId] = useState(eras[1].id);
+  const [compareData, setCompareData] = useState<EraDataset | null>(null);
+  const [compareState, setCompareState] = useState<LoadState>("loading");
+  const [compareBalance, setCompareBalance] = useState(50);
+  const compareCache = useRef(new Map<string, EraDataset>());
   const [data, setData] = useState<EraDataset | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [retry, setRetry] = useState(0);
@@ -94,6 +118,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const closeLearning = useCallback(() => setLearningOpen(false), []);
   const copy = ui[locale];
   const selectedEra = eras.find((era) => era.id === selectedId) ?? eras[0];
+  const compareEra = eras.find((era) => era.id === compareId) ?? eras[1];
+  const historicalEras = eras.filter((era) => era.kind === "historical-reconstruction");
   const territorySource = sources.find((item) => item.id === "cliopatria-v021");
   const events = data?.events.features ?? [];
   const categoryLabels: Record<EventCategory, string> = {
@@ -121,6 +147,11 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
 
   function selectEra(id: string) {
     if (id === selectedId) return;
+    if (id === compareId && compareOpen) {
+      setCompareId(selectedId);
+      setCompareData(null);
+    }
+    if (id === "technical-fixture") setCompareOpen(false);
     setSelectedEventId(null);
     setClosingEventId(null);
     setSelectedFigureId(null);
@@ -129,6 +160,19 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     setData(null);
     setLoadState("loading");
     setSelectedId(id);
+  }
+
+  function toggleCompare() {
+    if (!compareOpen) {
+      if (compareId === selectedId) setCompareId(historicalEras.find((era) => era.id !== selectedId)!.id);
+      setSelectedEventId(null);
+      setSelectedFigureId(null);
+      setClosingEventId(null);
+      setClosingFigureId(null);
+      setGuideOpen(false);
+      setLearningOpen(false);
+    }
+    setCompareOpen((current) => !current);
   }
 
   function openEvent(id: string, fromMap = false) {
@@ -193,6 +237,43 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     return () => controller.abort();
   }, [selectedId, retry]);
 
+  useEffect(() => {
+    if (!compareOpen || compareId === selectedId) return;
+    const cached = compareCache.current.get(compareId);
+    if (cached) {
+      setCompareData(cached);
+      setCompareState("ready");
+      return;
+    }
+    const controller = new AbortController();
+    const era = eras.find((item) => item.id === compareId);
+    if (!era || era.kind !== "historical-reconstruction") return;
+    const knownSources = new Set(sources.map((item) => item.id));
+    async function load() {
+      setCompareData(null);
+      setCompareState("loading");
+      try {
+        const [territoryResponse, eventResponse] = await Promise.all([
+          fetch(era!.territoryUrl, { signal: controller.signal }),
+          fetch(era!.eventUrl, { signal: controller.signal }),
+        ]);
+        if (!territoryResponse.ok || !eventResponse.ok) throw new Error("Comparison GeoJSON request failed");
+        const [territories, events] = await Promise.all([territoryResponse.json(), eventResponse.json()]);
+        const validated = validateEraData(era!, territories, events, knownSources);
+        if (controller.signal.aborted) return;
+        compareCache.current.set(compareId, validated);
+        setCompareData(validated);
+        setCompareState("ready");
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        console.error("Comparison era could not load", error);
+        setCompareState("error");
+      }
+    }
+    void load();
+    return () => controller.abort();
+  }, [compareOpen, compareId, selectedId, retry]);
+
   return <main className="atlas-shell">
     <header className="atlas-header">
       <div className="brand-lockup" aria-label={`МҰРА, ${copy.brandSubtitle}`}>
@@ -217,12 +298,28 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
       <nav className="timeline-region" aria-label={copy.timelineLabel}>
         <div className="section-heading"><h2>{copy.periods}</h2><span>{formatCount(locale, 3, copy.cuts.split("|") as [string, string, string])}</span></div>
         <div className="timeline" role="group" aria-label={copy.timelineGroup}>
-          {eras.filter((era) => era.kind === "historical-reconstruction").map((era, index) => <button
+          {historicalEras.map((era, index) => <button
             key={era.id} type="button" className={`timeline-option${selectedId === era.id ? " is-active" : ""}`}
             aria-pressed={selectedId === era.id} onClick={() => selectEra(era.id)}>
             <span className="timeline-index" aria-hidden="true">0{index + 1}</span><span className="timeline-dot" aria-hidden="true" /><span>{eraText(era, "label", locale)}</span>
           </button>)}
         </div>
+        {selectedEra.kind === "historical-reconstruction" && <button type="button" className={`compare-toggle${compareOpen ? " is-active" : ""}`}
+          aria-pressed={compareOpen} onClick={toggleCompare}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M3 7h18M3 17h18M8 3v8m8 2v8" /></svg>
+          {compareOpen ? copy.compareClose : copy.compareMode}
+        </button>}
+        {compareOpen && <div className="compare-controls" role="group" aria-label={copy.compareMode}>
+          <label>{copy.compareFirst}<select value={selectedId} onChange={(event) => selectEra(event.target.value)}>
+            {historicalEras.filter((era) => era.id !== compareId).map((era) => <option key={era.id} value={era.id}>{eraText(era, "label", locale)}</option>)}
+          </select></label>
+          <label>{copy.compareSecond}<select value={compareId} onChange={(event) => { setCompareData(null); setCompareId(event.target.value); }}>
+            {historicalEras.filter((era) => era.id !== selectedId).map((era) => <option key={era.id} value={era.id}>{eraText(era, "label", locale)}</option>)}
+          </select></label>
+          <div className="compare-range"><label htmlFor="compare-balance">{copy.compareBalance}</label><div><span>{copy.compareEarlier}</span>
+            <input id="compare-balance" type="range" min="0" max="100" value={compareBalance} onChange={(event) => setCompareBalance(Number(event.target.value))} />
+            <span>{copy.compareLater}</span></div></div>
+        </div>}
         {process.env.NODE_ENV === "development" && <button type="button" className={`fixture-option${selectedId === "technical-fixture" ? " is-active" : ""}`}
           aria-pressed={selectedId === "technical-fixture"} onClick={() => selectEra("technical-fixture")}>
           {copy.fixtureControl} <span aria-hidden="true">↗</span>
@@ -230,9 +327,10 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
       </nav>
       <section className="map-region" aria-label={copy.mapLabel}>
         <MapCanvas data={data} eraId={selectedId} locale={locale} categoryFilter={categoryFilter}
+          compareEnabled={compareOpen} compareData={compareData} compareEraId={compareId} compareBalance={compareBalance}
           selectedEventId={selectedEventId} onSelectEvent={(id) => openEvent(id, true)} />
         <div className="map-caption"><span className="caption-rule" aria-hidden="true" />{copy.mapCaption}</div>
-        {selectedEra.kind === "historical-reconstruction" && <div className="map-tools">
+        {selectedEra.kind === "historical-reconstruction" && !compareOpen && <div className="map-tools">
           <label htmlFor="map-category-filter">{copy.mapFilterLabel}</label>
           <select id="map-category-filter" value={categoryFilter}
             onChange={(event) => setCategoryFilter(event.target.value as EventCategory | "all")}>
@@ -240,18 +338,27 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             {categories.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}
           </select>
         </div>}
-        {loadState === "ready" && selectedEra.kind === "historical-reconstruction" && locatedCount === 0
+        {loadState === "ready" && !compareOpen && selectedEra.kind === "historical-reconstruction" && locatedCount === 0
           && <div className="map-empty" role="status">{copy.mapNoLocatedEvents}</div>}
-        {selectedEra.kind === "historical-reconstruction" && <div className="map-legend">
-          <span className="legend-line" aria-hidden="true" />{copy.approxReconstruction}
-          {events.some((feature) => feature.geometry) && <span className="legend-marker">{copy.approxMarker}</span>}
+        {selectedEra.kind === "historical-reconstruction" && <div className={`map-legend${compareOpen ? " is-comparing" : ""}`}>
+          {compareOpen ? <><span className="compare-legend-item"><i className="compare-swatch" aria-hidden="true" />{eraText(selectedEra, "label", locale)}</span>
+            <span className="compare-legend-item"><i className="compare-swatch compare-swatch-second" aria-hidden="true" />{eraText(compareEra, "label", locale)}</span>
+            <span className="compare-legend-note">{copy.boundaryApprox} · <a href={territorySource?.url} target="_blank" rel="noopener noreferrer">Seshat ↗</a></span></>
+            : <><span className="legend-line" aria-hidden="true" />{copy.approxReconstruction}
+              {events.some((feature) => feature.geometry) && <span className="legend-marker">{copy.approxMarker}</span>}</>}
         </div>}
         {selectedEra.kind === "technical-fixture" && <div className="map-fixture-label">{copy.fixtureMapLabel}</div>}
       </section>
       <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : "panel-title"}>
         <div className="atlas-panel-content" hidden={guideOpen || learningOpen}>
-        <div className="panel-overline">{activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
-        {activeEvent ? <section key={activeEvent.properties.id}
+        <div className="panel-overline">{compareOpen ? copy.compareMode : activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
+        {compareOpen ? <section className="compare-panel" aria-labelledby="panel-title">
+          <h1 id="panel-title">{copy.compareTitle}</h1><p className="panel-intro">{copy.compareIntro}</p>
+          <p className="certainty-note">{copy.boundaryApprox}</p>
+          <CompareEraSummary era={selectedEra} data={data} status={loadState} locale={locale} tone="first" onExplore={() => setCompareOpen(false)} />
+          {compareState === "error" && <div className="data-message" role="alert">{copy.compareError} <button type="button" className="retry-button" onClick={() => setRetry((value) => value + 1)}>{copy.retry}</button></div>}
+          <CompareEraSummary era={compareEra} data={compareData} status={compareState} locale={locale} tone="second" onExplore={() => { setCompareOpen(false); selectEra(compareId); }} />
+        </section> : activeEvent ? <section key={activeEvent.properties.id}
           className={`event-detail${closingEventId === activeEvent.properties.id ? " is-closing" : ""}`}
           onAnimationEnd={(event) => {
             if (event.currentTarget === event.target && closingEventId === activeEvent.properties.id) {

@@ -1,0 +1,225 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "abylai-orenburg-1740",
+        "eraId": "kazakh-1738-1781",
+        "kind": "event",
+        "name": {
+          "ru": "Абылай на переговорах в Оренбурге",
+          "kk": "Абылай Орынбордағы келіссөзде",
+          "en": "Abylai at Orenburg talks"
+        },
+        "dateLabel": {
+          "ru": "1740",
+          "kk": "1740",
+          "en": "1740"
+        },
+        "description": {
+          "ru": "Абылай и хан Әбілмәмбет прибыли в Оренбург на переговоры с российской администрацией. Дипломатия стала одной из опор политики Абылая между соседними державами.",
+          "kk": "Абылай мен Әбілмәмбет хан Ресей әкімшілігімен келіссөзге Орынборға келді. Көрші державалар арасындағы саясатта дипломатия Абылай үшін маңызды құрал болды.",
+          "en": "Abylai and Khan Abilmambet travelled to Orenburg for talks with the Russian administration. Diplomacy became one part of Abylai’s policy between neighbouring powers."
+        },
+        "startYear": 1740,
+        "endYear": 1740,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "abylai"
+        ],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-abylai-en"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "abylai-captivity-1741",
+        "eraId": "kazakh-1738-1781",
+        "kind": "event",
+        "name": {
+          "ru": "Пленение Абылая джунгарами",
+          "kk": "Абылайдың жоңғар тұтқынына түсуі",
+          "en": "Abylai captured by Dzungars"
+        },
+        "dateLabel": {
+          "ru": "1741",
+          "kk": "1741",
+          "en": "1741"
+        },
+        "description": {
+          "ru": "Во время войны Абылай попал в джунгарский плен. Его освобождение потребовало переговоров и обращений казахских лидеров к российской администрации.",
+          "kk": "Соғыс кезінде Абылай жоңғар тұтқынына түсті. Оны босату үшін келіссөздер және қазақ басшыларының Ресей әкімшілігіне өтініштері қажет болды.",
+          "en": "Abylai was captured by Dzungar forces during the war. His release required negotiations and appeals from Kazakh leaders to the Russian administration."
+        },
+        "startYear": 1741,
+        "endYear": 1741,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "abylai"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-abylai-en"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "abylai-release-1743",
+        "eraId": "kazakh-1738-1781",
+        "kind": "event",
+        "name": {
+          "ru": "Освобождение Абылая",
+          "kk": "Абылайдың тұтқыннан босатылуы",
+          "en": "Abylai released from captivity"
+        },
+        "dateLabel": {
+          "ru": "1743",
+          "kk": "1743",
+          "en": "1743"
+        },
+        "description": {
+          "ru": "Абылай был освобождён после дипломатических усилий; в источниках отмечено содействие российской миссии. Возвращение укрепило его положение в политике Среднего жуза.",
+          "kk": "Дипломатиялық әрекеттерден кейін Абылай босатылды; деректер Ресей елшілігінің көмегін атайды. Оның оралуы Орта жүз саясатындағы беделін күшейтті.",
+          "en": "Abylai was released after diplomatic efforts, with a Russian mission noted in the sources. His return strengthened his position in Middle Zhuz politics."
+        },
+        "startYear": 1743,
+        "endYear": 1743,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "abylai",
+          "kazybek-bi"
+        ],
+        "highlightRank": 3,
+        "sourceIds": [
+          "eh-abylai-en",
+          "eh-kazybek-diplomacy"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "abylai-qing-1756",
+        "eraId": "kazakh-1738-1781",
+        "kind": "event",
+        "name": {
+          "ru": "Столкновения с войсками Цин",
+          "kk": "Цин әскерімен қақтығыстар",
+          "en": "Clashes with Qing forces"
+        },
+        "dateLabel": {
+          "ru": "1756–1757",
+          "kk": "1756–1757",
+          "en": "1756–1757"
+        },
+        "description": {
+          "ru": "После падения Джунгарии отряды Абылая столкнулись с войсками Цин. Военные действия сопровождались поиском дипломатического урегулирования на восточной границе.",
+          "kk": "Жоңғария құлағаннан кейін Абылай жасақтары Цин әскерімен қақтығысты. Әскери әрекеттер шығыс шекарада дипломатиялық шешім іздеумен қатар жүрді.",
+          "en": "After Dzungaria’s collapse, Abylai’s forces clashed with Qing troops. Fighting was accompanied by efforts to reach a diplomatic settlement on the eastern frontier."
+        },
+        "startYear": 1756,
+        "endYear": 1757,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "abylai"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-abylai-en"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "abylai-elected-1771",
+        "eraId": "kazakh-1738-1781",
+        "kind": "event",
+        "name": {
+          "ru": "Абылай провозглашён ханом",
+          "kk": "Абылай хан көтерілді",
+          "en": "Abylai proclaimed khan"
+        },
+        "dateLabel": {
+          "ru": "1771",
+          "kk": "1771",
+          "en": "1771"
+        },
+        "description": {
+          "ru": "После смерти Әбілмәмбета влиятельные султаны и старшины провозгласили Абылая ханом. Его политика сочетала военное руководство и переговоры с Россией и Цин.",
+          "kk": "Әбілмәмбет қайтыс болған соң беделді сұлтандар мен ақсақалдар Абылайды хан көтерді. Оның саясаты әскери басшылықты Ресей және Цинмен келіссөзбен ұштастырды.",
+          "en": "After Abilmambet’s death, leading sultans and elders proclaimed Abylai khan. His policy combined military leadership with negotiations involving Russia and the Qing."
+        },
+        "startYear": 1771,
+        "endYear": 1771,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "abylai"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-abylai-en"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bukhar-oral-poetry",
+        "eraId": "kazakh-1738-1781",
+        "kind": "event",
+        "name": {
+          "ru": "Устная поэзия Бухара жырау при Абылае",
+          "kk": "Абылай тұсындағы Бұқар жыраудың ауызша поэзиясы",
+          "en": "Bukhar Zhyrau’s oral poetry under Abylai"
+        },
+        "dateLabel": {
+          "ru": "1740–1781",
+          "kk": "1740–1781",
+          "en": "1740–1781"
+        },
+        "description": {
+          "ru": "Бухар жырау был известен как советник Абылая. Его толгау обсуждали власть, единство и нужды народа, сохраняя политическую память в устной традиции; точные даты отдельных произведений не установлены.",
+          "kk": "Бұқар жырау Абылайдың кеңесшісі ретінде белгілі болды. Оның толғаулары билік, бірлік және халық мұңын қозғап, саяси жадыны ауызша дәстүрде сақтады; жеке туындылардың нақты мерзімі белгісіз.",
+          "en": "Bukhar Zhyrau was known as an adviser to Abylai. His oral poetry addressed power, unity, and public needs, preserving political memory through performance; individual works cannot be dated precisely."
+        },
+        "startYear": 1740,
+        "endYear": 1781,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "bukhar-zhyrau",
+          "abylai"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-bukhar-zhyrau",
+          "gov-bukhar"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

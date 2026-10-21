@@ -1,0 +1,42 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "khanate-formation",
+        "eraId": "kazakh-1465-1467",
+        "kind": "event",
+        "name": {
+          "ru": "Формирование Казахского ханства",
+          "kk": "Қазақ хандығының қалыптасуы",
+          "en": "Formation of the Kazakh Khanate"
+        },
+        "dateLabel": {
+          "ru": "1465–1466",
+          "kk": "1465–1466",
+          "en": "1465–1466"
+        },
+        "description": {
+          "ru": "Керей и Жанибек объединили откочевавшие от Абулхаира группы в западном Жетысу. Датировка опирается на позднейшее сообщение Мухаммеда Хайдара Дулати; точные рубежи раннего ханства неизвестны.",
+          "kk": "Керей мен Жәнібек Әбілқайырдан бөлінген топтарды Батыс Жетісуда біріктірді. Мерзім Мұхаммед Хайдар Дулатидің кейінгі мәліметіне сүйенеді; алғашқы хандықтың нақты шекарасы белгісіз.",
+          "en": "Kerei and Janibek united groups that had left Abu'l-Khayr in western Zhetysu. The dating rests on Muhammad Haidar Dulati's later account; the early khanate's precise limits are unknown."
+        },
+        "startYear": 1465,
+        "endYear": 1466,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kerei",
+          "janibek"
+        ],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

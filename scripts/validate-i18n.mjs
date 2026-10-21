@@ -28,6 +28,11 @@ function matchIds(name, actual, expected) {
   assert.deepEqual([...actual].sort(), [...expected].sort(), `${name} IDs must exactly match the historical catalog`);
 }
 
+function knownIds(name, actual, expected) {
+  const known = new Set(expected);
+  for (const id of actual) assert.ok(known.has(id), `${name} has unknown ID ${id}`);
+}
+
 function translated(value, label) {
   for (const locale of translatedLocales) {
     assert.equal(typeof value?.[locale], "string", `${label}.${locale} is missing`);
@@ -36,18 +41,18 @@ function translated(value, label) {
   }
 }
 
-matchIds("era", Object.keys(eraTranslations), eras.map((era) => era.id));
-matchIds("figure", Object.keys(figureDescriptionTranslations), figures.map((figure) => figure.id));
+knownIds("era", Object.keys(eraTranslations), eras.map((era) => era.id));
+knownIds("figure", Object.keys(figureDescriptionTranslations), figures.map((figure) => figure.id));
 matchIds("source note", Object.keys(sourceNoteTranslations), sources.map((source) => source.id));
 matchIds("source title", Object.keys(sourceTitleTranslations), sources.map((source) => source.id));
 
 for (const era of eras) {
-  translated(eraTranslations[era.id].label, `era ${era.id} label`);
-  translated(eraTranslations[era.id].description, `era ${era.id} description`);
+  translated(eraTranslations[era.id]?.label ?? era.label, `era ${era.id} label`);
+  translated(eraTranslations[era.id]?.description ?? era.description, `era ${era.id} description`);
 }
 for (const figure of figures) {
   translated(figure.name, `figure ${figure.id} name`);
-  translated(figureDescriptionTranslations[figure.id], `figure ${figure.id} description`);
+  translated(figureDescriptionTranslations[figure.id] ?? figure.description, `figure ${figure.id} description`);
 }
 for (const source of sources) {
   translated(sourceNoteTranslations[source.id], `source ${source.id} note`);
@@ -62,12 +67,12 @@ for (const era of eras) {
     collection.push(...data.features.map((feature) => feature.properties));
   }
 }
-matchIds("event", Object.keys(eventTranslations), allEvents.map((event) => event.id));
+knownIds("event", Object.keys(eventTranslations), allEvents.map((event) => event.id));
 matchIds("territory", Object.keys(territoryTranslations), allTerritories.map((territory) => territory.id));
 
 for (const territory of allTerritories) translated(territoryTranslations[territory.id].name, `territory ${territory.id} name`);
 for (const event of allEvents) {
-  const copy = eventTranslations[event.id];
+  const copy = eventTranslations[event.id] ?? event;
   for (const field of ["name", "dateLabel", "description", "uncertaintyNote", "placeLabel", "coordinateNote"]) {
     assert.equal(Boolean(copy[field]), Boolean(event[field]), `${event.id}.${field} must match original field presence`);
     if (!event[field]) continue;

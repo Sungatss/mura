@@ -1,0 +1,107 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ualy-recognized-1782",
+        "eraId": "kazakh-1782-1836",
+        "kind": "event",
+        "name": {
+          "ru": "Уали утверждён ханом Среднего жуза",
+          "kk": "Уәли Орта жүз ханы болып бекітілді",
+          "en": "Uali confirmed as Middle Zhuz khan"
+        },
+        "dateLabel": {
+          "ru": "1782",
+          "kk": "1782",
+          "en": "1782"
+        },
+        "description": {
+          "ru": "После смерти Абылая Екатерина II утвердила его сына Уали ханом Среднего жуза; позднее прошла церемония вступления. Архивные документы показывают растущее вмешательство империи в ханские дела.",
+          "kk": "Абылай қайтыс болғаннан кейін Екатерина II оның ұлы Уәлиді Орта жүз ханы етіп бекітті; кейін таққа отыру рәсімі өтті. Мұрағат құжаттары империяның хандық істерге араласуы күшейгенін көрсетеді.",
+          "en": "After Abylai’s death, Catherine II confirmed his son Uali as khan of the Middle Zhuz, followed by an enthronement ceremony. Archival documents show growing imperial intervention in khanate affairs."
+        },
+        "startYear": 1782,
+        "endYear": 1782,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-ualy-archive"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "bokey-appointed-1815",
+        "eraId": "kazakh-1782-1836",
+        "kind": "event",
+        "name": {
+          "ru": "Назначение второго хана Среднего жуза",
+          "kk": "Орта жүзге екінші ханның тағайындалуы",
+          "en": "A second Middle Zhuz khan appointed"
+        },
+        "dateLabel": {
+          "ru": "1815",
+          "kk": "1815",
+          "en": "1815"
+        },
+        "description": {
+          "ru": "Имперская администрация назначила Бокея ещё одним ханом Среднего жуза при живом Уали. Параллельное правление усилило политическую раздробленность.",
+          "kk": "Империялық әкімшілік Уәли тірі кезінде Бөкейді Орта жүздің тағы бір ханы етіп тағайындады. Қатар билік саяси бытыраңқылықты күшейтті.",
+          "en": "The imperial administration appointed Bokey as another Middle Zhuz khan while Uali was still alive. Parallel rule deepened political fragmentation."
+        },
+        "startYear": 1815,
+        "endYear": 1815,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-ualy-archive"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "siberian-statute-1822",
+        "eraId": "kazakh-1782-1836",
+        "kind": "event",
+        "name": {
+          "ru": "Устав о сибирских киргизах",
+          "kk": "Сібір қазақтары туралы жарғы",
+          "en": "Statute on the Siberian Kazakhs"
+        },
+        "dateLabel": {
+          "ru": "1822",
+          "kk": "1822",
+          "en": "1822"
+        },
+        "description": {
+          "ru": "Имперский устав ввёл окружную систему управления в степи и сократил полномочия традиционного суда биев. Эти перемены стали одной из предпосылок будущего восстания Кенесары.",
+          "kk": "Империялық жарғы далада округтік басқару жүйесін енгізіп, дәстүрлі билер сотының өкілетін қысқартты. Бұл өзгерістер кейінгі Кенесары көтерілісінің алғышарттарының бірі болды.",
+          "en": "The imperial statute introduced district administration in the steppe and reduced the authority of traditional bi courts. These changes contributed to the later Kenesary uprising."
+        },
+        "startYear": 1822,
+        "endYear": 1822,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [],
+        "highlightRank": 3,
+        "sourceIds": [
+          "eh-kenesary-revolt"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

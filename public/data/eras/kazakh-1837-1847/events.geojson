@@ -1,0 +1,185 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kenesary-uprising-1837",
+        "eraId": "kazakh-1837-1847",
+        "kind": "event",
+        "name": {
+          "ru": "Начало восстания Кенесары",
+          "kk": "Кенесары көтерілісінің басталуы",
+          "en": "Kenesary’s uprising begins"
+        },
+        "dateLabel": {
+          "ru": "1837",
+          "kk": "1837",
+          "en": "1837"
+        },
+        "description": {
+          "ru": "Движение Кенесары выступило против расширения имперской администрации и ограничения кочевых земель. Его целью было восстановление ханской власти и политической самостоятельности.",
+          "kk": "Кенесары қозғалысы империялық әкімшіліктің кеңеюіне және көшпелі жердің тарылуына қарсы шықты. Мақсаты хандық билік пен саяси дербестікті қалпына келтіру болды.",
+          "en": "Kenesary’s movement opposed expanding imperial administration and the narrowing of nomadic lands. It sought to restore khanate rule and political autonomy."
+        },
+        "startYear": 1837,
+        "endYear": 1837,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kenesary"
+        ],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-kenesary-revolt"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "akmola-siege-1838",
+        "eraId": "kazakh-1837-1847",
+        "kind": "event",
+        "name": {
+          "ru": "Осада Акмолинского укрепления",
+          "kk": "Ақмола бекінісінің қоршауы",
+          "en": "Siege of the Akmola fortification"
+        },
+        "dateLabel": {
+          "ru": "1838",
+          "kk": "1838",
+          "en": "1838"
+        },
+        "description": {
+          "ru": "Отряды Кенесары осадили и сожгли Акмолинское укрепление, затем переместились к Тургаю. Военная акция расширила масштаб восстания.",
+          "kk": "Кенесары жасақтары Ақмола бекінісін қоршап, өртеді, содан кейін Торғайға қарай көшті. Әскери әрекет көтерілістің ауқымын кеңейтті.",
+          "en": "Kenesary’s forces besieged and burned the Akmola fortification before moving toward Turgay. The operation widened the uprising."
+        },
+        "startYear": 1838,
+        "endYear": 1838,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kenesary"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-kenesary-revolt"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kenesary-elected-1841",
+        "eraId": "kazakh-1837-1847",
+        "kind": "event",
+        "name": {
+          "ru": "Кенесары избран ханом",
+          "kk": "Кенесары хан сайланды",
+          "en": "Kenesary elected khan"
+        },
+        "dateLabel": {
+          "ru": "1841",
+          "kk": "1841",
+          "en": "1841"
+        },
+        "description": {
+          "ru": "Представители трёх жузов избрали Кенесары ханом. Этот шаг выразил стремление участников движения восстановить единое ханское управление.",
+          "kk": "Үш жүздің өкілдері Кенесарыны хан сайлады. Бұл қадам қозғалысқа қатысушылардың біртұтас хандық басқаруды қалпына келтіру ниетін білдірді.",
+          "en": "Representatives of the three zhuzes elected Kenesary khan. The decision expressed the movement’s aim to restore unified khanate governance."
+        },
+        "startYear": 1841,
+        "endYear": 1841,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kenesary"
+        ],
+        "highlightRank": 3,
+        "sourceIds": [
+          "eh-kenesary-revolt"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kenesary-victory-1844",
+        "eraId": "kazakh-1837-1847",
+        "kind": "event",
+        "name": {
+          "ru": "Победа отрядов Кенесары",
+          "kk": "Кенесары жасақтарының жеңісі",
+          "en": "Kenesary’s forces win a major engagement"
+        },
+        "dateLabel": {
+          "ru": "1844",
+          "kk": "1844",
+          "en": "1844"
+        },
+        "description": {
+          "ru": "Отряды Кенесары разгромили вооружённую группу султана Жанторина. Успех укрепил позиции восставших, хотя не завершил многолетнее противостояние.",
+          "kk": "Кенесары жасақтары Жантөрин сұлтанның қарулы тобын талқандады. Жеңіс көтерілісшілердің жағдайын нығайтты, бірақ ұзақ қарсыласуды аяқтамады.",
+          "en": "Kenesary’s forces defeated Sultan Zhantorin’s armed group. The victory strengthened the rebels but did not end the prolonged conflict."
+        },
+        "startYear": 1844,
+        "endYear": 1844,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kenesary"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-kenesary-revolt"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kenesary-death-1847",
+        "eraId": "kazakh-1837-1847",
+        "kind": "event",
+        "name": {
+          "ru": "Гибель Кенесары",
+          "kk": "Кенесарының қаза болуы",
+          "en": "Death of Kenesary"
+        },
+        "dateLabel": {
+          "ru": "1847",
+          "kk": "1847",
+          "en": "1847"
+        },
+        "description": {
+          "ru": "Кенесары погиб во время похода против киргизских манапов; после этого его движение распалось. Память о восстании остаётся важной и сложной частью истории региона.",
+          "kk": "Кенесары қырғыз манаптарына қарсы жорық кезінде қаза болды; содан кейін оның қозғалысы ыдырады. Көтеріліс туралы естелік өңір тарихының маңызды әрі күрделі бөлігі болып қалды.",
+          "en": "Kenesary died during a campaign against Kyrgyz manaps, after which his movement broke apart. The uprising remains an important and complex part of regional history."
+        },
+        "startYear": 1847,
+        "endYear": 1847,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kenesary"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-kenesary-revolt"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

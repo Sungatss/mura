@@ -141,6 +141,18 @@ export const sourceNoteTranslations: Record<string, Translation> = {
   "eh-abulkhair": { kk: "Кіші жүз ханы туралы өмірбаян мақаласы.", en: "Biographical article about the Junior Zhuz khan." },
   "eh-oath": { kk: "1731 жылғы 10 қазан оқиғалары туралы оқу материалы.", en: "Educational material about events on 10 October 1731." },
   "ordabasy-monument": { kk: "Координаттар 1726 жылғы құрылтайдың дәл орнын емес, Ордабасыдағы қазіргі «Бірлік» ескерткішін көрсетеді.", en: "Coordinates locate the modern Birlik monument at Ordabasy, not the exact site of the 1726 assembly." },
+  "eh-political-history": { kk: "Хандықтың құрылуы мен XVI–XVII ғасырлардағы саяси тарихына шолу; құрылу мерзімі тарихнамалық баға.", en: "Overview of the khanate's formation and sixteenth to seventeenth-century politics; the foundation date is a historiographic estimate." },
+  "eh-foreign-relations": { kk: "XVI–XVIII ғасыр басындағы елшіліктер мен дипломатиялық байланыстарға шолу.", en: "Overview of embassies and diplomatic contacts from the sixteenth to early eighteenth centuries." },
+  "eh-seventeenth": { kk: "Есім, Жәңгір, Тәуке және Жеті жарғы туралы шолу; заңдардың нақты мерзімі анықталмаған.", en: "Overview of Esim, Jangir, Tauke, and Zheti Zhargy; the code's exact dating is unsettled." },
+  "eh-dzungar-invasions": { kk: "Қарақұм құрылтайы және XVIII ғасыр басындағы жоңғар шапқыншылығына қарсылық туралы шолу.", en: "Overview of the Karakum assembly and resistance to early eighteenth-century Dzungar incursions." },
+  "eh-abylai-en": { kk: "Абылайдың әскери және дипломатиялық қызметі туралы өмірбаян; даулы сандық бағалар алынбаған.", en: "Biography of Abylai's military and diplomatic career; disputed quantitative estimates are omitted." },
+  "eh-ualy-archive": { kk: "Уәлидің мұрагерлігі мен Орта жүз ханы ретінде бекітілуіне қатысты мұрағат құжаттарына шолу.", en: "Overview of archival documents on Uali's succession and confirmation as Middle Zhuz khan." },
+  "eh-kenesary-revolt": { kk: "Кенесары көтерілісінің себептері, жорықтары мен күрделі мұрасына шолу.", en: "Overview of the causes, campaigns, and complex legacy of Kenesary's uprising." },
+  ...Object.fromEntries(["burundyk", "kasym", "tauekel", "esim", "jangir", "tauke", "tole-bi", "kazybek-bi", "aiteke-bi", "bogenbay", "kabanbay", "abylai", "bukhar-zhyrau", "kenesary"].map((id) => [
+    `eh-${id}`, { kk: "Өмірбаян мақаласы; деректер өз сөзімізбен мазмұндалған.", en: "Biographical article; facts are paraphrased." },
+  ])),
+  "gov-bukhar": { kk: "Мемлекеттік архив материалы жыраудың Абылай кеңесшісі болғанын растайды.", en: "Government archive article corroborating the zhyrau's role as an adviser to Abylai." },
+  "eh-kazybek-diplomacy": { kk: "Мақала Қазыбек биді Абылайдың босатылуымен байланыстырады; басқа деректер Ресей елшілігінің рөлін атайды.", en: "The article links Kazybek Bi to Abylai's release; other sources note the Russian mission's role." },
 };
 
 // Display labels are translations, not claims about the exact title printed on a linked page.
@@ -157,13 +169,37 @@ export const sourceTitleTranslations: Record<string, Translation> = {
   "eh-abulkhair": { kk: "Qazaqstan Tarihy: Әбілқайыр хан", en: "Qazaqstan Tarihy: Abulkhair Khan" },
   "eh-oath": { kk: "Qazaqstan Tarihy: А. Тевкелев елшілігі және 1731 жылғы ант", en: "Qazaqstan Tarihy: A. Tevkelev's embassy and the 1731 oath" },
   "ordabasy-monument": { kk: "Open Kazakhstan: Ордабасыдағы серуен", en: "Open Kazakhstan: A walk around Ordabasy" },
+  "eh-political-history": { kk: "Qazaqstan Tarihy: Қазақ хандығының саяси тарихы", en: "Qazaqstan Tarihy: Political history of the Kazakh Khanate" },
+  "eh-foreign-relations": { kk: "Qazaqstan Tarihy: Қазақ хандығы мен Ресейдің сыртқы байланыстары", en: "Qazaqstan Tarihy: Kazakh-Russian foreign relations" },
+  "eh-seventeenth": { kk: "Qazaqstan Tarihy: XVII–XVIII ғасырлардағы Қазақ хандығы", en: "Qazaqstan Tarihy: The Kazakh Khanate in the seventeenth to eighteenth centuries" },
+  "eh-dzungar-invasions": { kk: "Qazaqstan Tarihy: Жоңғар шапқыншылықтары", en: "Qazaqstan Tarihy: Dzungar invasions" },
+  "eh-abylai-en": { kk: "Qazaqstan Tarihy: Абылай хан", en: "Qazaqstan Tarihy: Abylai Khan" },
+  "eh-ualy-archive": { kk: "Qazaqstan Tarihy: Абылайдан кейінгі мұрағат құжаттары", en: "Qazaqstan Tarihy: Documents after Abylai's death" },
+  "eh-kenesary-revolt": { kk: "Qazaqstan Tarihy: Кенесары көтерілісі", en: "Qazaqstan Tarihy: Kenesary's uprising" },
+  "eh-burundyk": { kk: "Qazaqstan Tarihy: Бұрындық хан", en: "Qazaqstan Tarihy: Burundyk Khan" },
+  "eh-kasym": { kk: "Qazaqstan Tarihy: Қасым хан", en: "Qazaqstan Tarihy: Qasym Khan" },
+  "eh-tauekel": { kk: "Qazaqstan Tarihy: Тәуекел хан", en: "Qazaqstan Tarihy: Tauekel Khan" },
+  "eh-esim": { kk: "Qazaqstan Tarihy: Есім хан", en: "Qazaqstan Tarihy: Esim Khan" },
+  "eh-jangir": { kk: "Qazaqstan Tarihy: Жәңгір хан", en: "Qazaqstan Tarihy: Jangir Khan" },
+  "eh-tauke": { kk: "Qazaqstan Tarihy: Тәуке хан", en: "Qazaqstan Tarihy: Tauke Khan" },
+  "eh-tole-bi": { kk: "Qazaqstan Tarihy: Төле би", en: "Qazaqstan Tarihy: Tole Bi" },
+  "eh-kazybek-bi": { kk: "Qazaqstan Tarihy: Қазыбек би", en: "Qazaqstan Tarihy: Kazybek Bi" },
+  "eh-aiteke-bi": { kk: "Qazaqstan Tarihy: Әйтеке би", en: "Qazaqstan Tarihy: Aiteke Bi" },
+  "eh-bogenbay": { kk: "Qazaqstan Tarihy: Бөгенбай батыр", en: "Qazaqstan Tarihy: Bogenbay Batyr" },
+  "eh-kabanbay": { kk: "Qazaqstan Tarihy: Қабанбай батыр", en: "Qazaqstan Tarihy: Kabanbay Batyr" },
+  "eh-abylai": { kk: "Qazaqstan Tarihy: Абылай хан", en: "Qazaqstan Tarihy: Abylai Khan" },
+  "eh-bukhar-zhyrau": { kk: "Qazaqstan Tarihy: Бұқар жырау", en: "Qazaqstan Tarihy: Bukhar Zhyrau" },
+  "eh-kenesary": { kk: "Qazaqstan Tarihy: Кенесары хан", en: "Qazaqstan Tarihy: Kenesary Khan" },
+  "gov-bukhar": { kk: "Gov.kz: Бұқар жырау Қалқаманұлы", en: "Gov.kz: Bukhar Zhyrau Qalqamanuly" },
+  "eh-kazybek-diplomacy": { kk: "Qazaqstan Tarihy: Қазыбек би, ұлы дипломат", en: "Qazaqstan Tarihy: Kazybek Bi, a diplomat" },
 };
 
 function translate(original: LocalizedText | undefined, translation: Translation | undefined, locale: Locale): string | undefined {
   if (!original) return undefined;
   if (locale === "ru") return original.ru;
-  if (!translation?.[locale]) throw new Error(`Missing ${locale} translation`);
-  return translation[locale];
+  const value = translation?.[locale] ?? original[locale];
+  if (!value) throw new Error(`Missing ${locale} translation`);
+  return value;
 }
 
 export function eraText(era: Era, field: "label" | "description", locale: Locale): string {

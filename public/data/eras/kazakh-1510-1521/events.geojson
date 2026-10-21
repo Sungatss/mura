@@ -1,0 +1,150 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "qasym-sygnak-1510",
+        "eraId": "kazakh-1510-1521",
+        "kind": "event",
+        "name": {
+          "ru": "Победа Касыма у Сыгнака",
+          "kk": "Қасымның Сығанақ түбіндегі жеңісі",
+          "en": "Qasym defeats Shaybani near Sygnak"
+        },
+        "dateLabel": {
+          "ru": "1510",
+          "kk": "1510",
+          "en": "1510"
+        },
+        "description": {
+          "ru": "Войска султана Касыма разбили силы Мухаммеда Шайбани у Сыгнака. Эта победа помогла ханству вернуть политическое влияние в присырдарьинском регионе.",
+          "kk": "Қасым сұлтанның әскері Сығанақ маңында Мұхаммед Шайбани күшін жеңді. Бұл жеңіс хандықтың Сырдария өңіріндегі саяси ықпалын қайта күшейтті.",
+          "en": "Qasym Sultan's forces defeated Muhammad Shaybani near Sygnak. The victory helped the khanate regain political influence in the Syr Darya region."
+        },
+        "startYear": 1510,
+        "endYear": 1510,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kasym"
+        ],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "burundyk-qasym-transition",
+        "eraId": "kazakh-1510-1521",
+        "kind": "event",
+        "name": {
+          "ru": "Переход власти от Бурундука к Касыму",
+          "kk": "Бұрындықтан Қасымға биліктің ауысуы",
+          "en": "Power shifts from Burundyk to Qasym"
+        },
+        "dateLabel": {
+          "ru": "1511–1512",
+          "kk": "1511–1512",
+          "en": "1511–1512"
+        },
+        "description": {
+          "ru": "Политическое влияние Касыма превзошло власть хана Бурундука; затем Касым возглавил ханство. Разные источники по-разному датируют формальный переход титула.",
+          "kk": "Қасымның саяси ықпалы Бұрындық ханның билігінен асып, кейін Қасым хандықты басқарды. Дереккөздер хан атағының ресми ауысуын әртүрлі мерзімдейді.",
+          "en": "Qasym gained greater political influence than Khan Burundyk and later led the khanate. Sources differ on the exact date when the formal title changed."
+        },
+        "startYear": 1511,
+        "endYear": 1512,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "burundyk",
+          "kasym"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "qasym-sairam-1513",
+        "eraId": "kazakh-1510-1521",
+        "kind": "event",
+        "name": {
+          "ru": "Сайрам признаёт власть Касыма",
+          "kk": "Сайрам Қасым билігін мойындады",
+          "en": "Sairam accepts Qasym’s authority"
+        },
+        "dateLabel": {
+          "ru": "1513",
+          "kk": "1513",
+          "en": "1513"
+        },
+        "description": {
+          "ru": "Правитель Сайрама обратился к Касыму за помощью против Шайбанидов и предложил передать ему город. Это укрепило позиции ханства на юге.",
+          "kk": "Сайрам билеушісі Шайбанилерге қарсы Қасымнан көмек сұрап, қаланы беруді ұсынды. Бұл хандықтың оңтүстіктегі орнын нығайтты.",
+          "en": "The governor of Sairam sought Qasym’s help against the Shaybanids and offered him the city. This strengthened the khanate’s position in the south."
+        },
+        "startYear": 1513,
+        "endYear": 1513,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kasym"
+        ],
+        "highlightRank": 3,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "qasym-zhetysu-1514",
+        "eraId": "kazakh-1510-1521",
+        "kind": "event",
+        "name": {
+          "ru": "Усиление Касыма в Жетысу",
+          "kk": "Қасым ықпалының Жетісуда күшеюі",
+          "en": "Qasym strengthens his position in Zhetysu"
+        },
+        "dateLabel": {
+          "ru": "1514",
+          "kk": "1514",
+          "en": "1514"
+        },
+        "description": {
+          "ru": "После ухода правителя Могулистана в Восточный Туркестан влияние Касыма в Жетысу усилилось. Источник также отмечает присоединение части ногайских групп на западе.",
+          "kk": "Моғолстан билеушісі Шығыс Түркістанға кеткен соң Қасымның Жетісудағы ықпалы күшейді. Дерек батыста ноғай топтарының бір бөлігінің қосылғанын да атап өтеді.",
+          "en": "After the ruler of Moghulistan moved to East Turkestan, Qasym’s influence in Zhetysu grew. The source also notes the movement of some Nogai groups into his sphere."
+        },
+        "startYear": 1514,
+        "endYear": 1514,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kasym"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

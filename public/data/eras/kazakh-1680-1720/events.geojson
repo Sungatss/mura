@@ -1,0 +1,188 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "zheti-zhargy-tradition",
+        "eraId": "kazakh-1680-1720",
+        "kind": "event",
+        "name": {
+          "ru": "Правовая традиция «Жеті жарғы»",
+          "kk": "«Жеті жарғы» құқықтық дәстүрі",
+          "en": "The Zheti Zhargy legal tradition"
+        },
+        "dateLabel": {
+          "ru": "1680–1715",
+          "kk": "1680–1715",
+          "en": "1680–1715"
+        },
+        "description": {
+          "ru": "С правлением Тауке и советом биев связывают упорядочение норм обычного права. Точная дата составления «Жеті жарғы» и исходный текст не установлены, поэтому здесь показан длительный процесс.",
+          "kk": "Тәуке билігі мен билер кеңесі әдет-ғұрып құқығын жүйелеумен байланыстырылады. «Жеті жарғының» нақты жасалған күні мен бастапқы мәтіні анықталмаған, сондықтан ол ұзақ үдеріс ретінде берілген.",
+          "en": "Tauke’s reign and the council of bi judges are associated with organizing customary law. Neither an exact compilation date nor the original text of Zheti Zhargy is established, so this represents a longer process."
+        },
+        "startYear": 1680,
+        "endYear": 1715,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "tauke",
+          "tole-bi",
+          "kazybek-bi",
+          "aiteke-bi"
+        ],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-seventeenth"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tashim-embassy-1687",
+        "eraId": "kazakh-1680-1720",
+        "kind": "event",
+        "name": {
+          "ru": "Посольство Ташима в Тобольск",
+          "kk": "Ташым елшілігінің Тобылға сапары",
+          "en": "Tashim’s embassy to Tobolsk"
+        },
+        "dateLabel": {
+          "ru": "1687",
+          "kk": "1687",
+          "en": "1687"
+        },
+        "description": {
+          "ru": "Тауке направил посольство во главе с батыром Ташимом, чтобы пригласить русских купцов. Миссия отражала стремление развивать торговые связи.",
+          "kk": "Тәуке орыс көпестерін шақыру үшін Ташым батыр бастаған елшілік жіберді. Бұл сапар сауда байланыстарын дамыту ниетін көрсетті.",
+          "en": "Tauke sent an embassy led by Batyr Tashim to invite Russian merchants. The mission reflected an effort to develop trade links."
+        },
+        "startYear": 1687,
+        "endYear": 1687,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "tauke"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-foreign-relations"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tuman-embassy-1689",
+        "eraId": "kazakh-1680-1720",
+        "kind": "event",
+        "name": {
+          "ru": "Посольство Тумана в Тобольск",
+          "kk": "Тұман елшілігінің Тобылға сапары",
+          "en": "Tuman’s embassy to Tobolsk"
+        },
+        "dateLabel": {
+          "ru": "1689–1690",
+          "kk": "1689–1690",
+          "en": "1689–1690"
+        },
+        "description": {
+          "ru": "В Тобольск отправилось новое казахское посольство во главе с батыром Туманом. Контакты продолжились, хотя долговременное соглашение тогда не было заключено.",
+          "kk": "Тұман батыр бастаған жаңа қазақ елшілігі Тобылға аттанды. Байланыстар жалғасты, бірақ сол кезде ұзақ мерзімді келісім жасалмады.",
+          "en": "Another Kazakh embassy led by Batyr Tuman travelled to Tobolsk. Contacts continued, although no lasting agreement was concluded then."
+        },
+        "startYear": 1689,
+        "endYear": 1690,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "tauke"
+        ],
+        "highlightRank": 3,
+        "sourceIds": [
+          "eh-foreign-relations"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "karakum-1710",
+        "eraId": "kazakh-1680-1720",
+        "kind": "event",
+        "name": {
+          "ru": "Каракумский курултай",
+          "kk": "Қарақұм құрылтайы",
+          "en": "Karakum kurultai"
+        },
+        "dateLabel": {
+          "ru": "1710",
+          "kk": "1710",
+          "en": "1710"
+        },
+        "description": {
+          "ru": "На собрании в Каракумах старейшины, бии и батыры договорились об общих силах для отпора джунгарам. Руководство ополчением поручили Богенбаю.",
+          "kk": "Қарақұмдағы жиында ақсақалдар, билер мен батырлар жоңғарларға қарсы ортақ жасақ құруға келісті. Қолбасшылық Бөгенбайға тапсырылды.",
+          "en": "At a gathering in Karakum, elders, bi judges, and batyrs agreed to form a joint force against the Dzungars. Bogenbay was entrusted with its command."
+        },
+        "startYear": 1710,
+        "endYear": 1710,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "bogenbay"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-dzungar-invasions"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ayagoz-1718",
+        "eraId": "kazakh-1680-1720",
+        "kind": "event",
+        "name": {
+          "ru": "Бои у реки Аягоз",
+          "kk": "Аягөз өзені маңындағы ұрыстар",
+          "en": "Fighting near the Ayagoz River"
+        },
+        "dateLabel": {
+          "ru": "1718",
+          "kk": "1718",
+          "en": "1718"
+        },
+        "description": {
+          "ru": "Казахские силы, включая отряды Кабанбая, сражались с джунгарами у Аягоза. Даже активная оборона не изменила тяжёлого положения Среднего жуза.",
+          "kk": "Қабанбай жасақтары қатысқан қазақ күштері Аягөз маңында жоңғарлармен шайқасты. Белсенді қорғаныс та Орта жүздің ауыр жағдайын өзгерте алмады.",
+          "en": "Kazakh forces, including Kabanbay’s units, fought the Dzungars near the Ayagoz River. Even active defence did not reverse the difficult position of the Middle Zhuz."
+        },
+        "startYear": 1718,
+        "endYear": 1718,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "kabanbay"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-dzungar-invasions"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

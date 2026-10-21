@@ -14,6 +14,7 @@ import { eras, sources } from "@/data/atlas";
 import { eventCategory, type EventCategory } from "@/data/event-categories";
 import { figures } from "@/data/figures";
 import { figureArtwork } from "@/data/figure-artwork";
+import { eraHistoryImages, eventHistoryImages, figureHistoryImages } from "@/data/history-images";
 import { figureSignificance } from "@/data/figure-profiles";
 import { ui } from "@/data/ui-translations";
 import { legal } from "@/data/legal";
@@ -29,6 +30,14 @@ function formatDisplayText(value: string) {
   return value.replaceAll(" — ", ": ");
 }
 
+function figureRole(id: string, locale: Locale): string {
+  const copy = ui[locale];
+  if (["tole-bi", "kazybek-bi", "aiteke-bi"].includes(id)) return copy.figureBiRole;
+  if (["bogenbay", "kabanbay"].includes(id)) return copy.figureBatyrRole;
+  if (id === "bukhar-zhyrau") return copy.figureZhyrauRole;
+  return copy.figureRole;
+}
+
 function SourceLinks({ ids, locale }: { ids: string[]; locale: Locale }) {
   const copy = ui[locale];
   return <ul className="source-list">{ids.map((id) => {
@@ -41,11 +50,13 @@ function SourceLinks({ ids, locale }: { ids: string[]; locale: Locale }) {
   })}</ul>;
 }
 
-function EventRow({ feature, locale, onSelect }: { feature: EventFeature; locale: Locale; onSelect: () => void }) {
+function EventRow({ feature, locale, onSelect, illustrated = false }: { feature: EventFeature; locale: Locale; onSelect: () => void; illustrated?: boolean }) {
   const event = feature.properties;
   const copy = ui[locale];
+  const image = illustrated ? eventHistoryImages[event.id] : undefined;
   return <li>
     <button type="button" className="content-row" onClick={onSelect}>
+      {image && <span className="content-row-image"><Image src={image.src} alt="" fill sizes="280px" /><span>{image.label[locale]}</span></span>}
       <span className="content-row-date">{eventText(event, "dateLabel", locale)}</span>
       <span className="content-row-main">{eventText(event, "name", locale)}</span>
       <span className="content-row-meta">{event.coordinateStatus === "technical-fixture" ? copy.fixturePoint : feature.geometry ? copy.mappedApprox : copy.noExactPoint}</span>
@@ -63,18 +74,20 @@ function FigureRow({ figure, locale, onSelect }: { figure: HistoricalFigure; loc
 }
 
 function CharacterCard({ figure, locale, eraLabel, onSelect }: { figure: HistoricalFigure; locale: Locale; eraLabel: string; onSelect: () => void }) {
-  const artwork = figureArtwork[figure.id];
+  const artwork = figureArtwork[figure.id] ?? figureHistoryImages[figure.id];
   const copy = ui[locale];
   const eventCount = formatCount(locale, figure.eventIds.length, copy.linkedEventUnits.split("|") as [string, string, string]);
   return <li><button type="button" className="character-card" onClick={onSelect} aria-label={`${copy.figureExplore}: ${figureText(figure, "name", locale)}`}>
-    <span className="character-card-image"><Image src={artwork.src} alt="" fill sizes="(max-width: 600px) 112px, 120px" style={{ objectPosition: artwork.position }} /></span>
+    <span className="character-card-image">{artwork
+      ? <Image src={artwork.src} alt="" fill sizes="(max-width: 600px) 112px, 120px" style={{ objectPosition: artwork.position }} />
+      : <span className="character-sigil" aria-hidden="true">{figureText(figure, "name", locale).slice(0, 1)}</span>}</span>
     <span className="character-card-content">
-      <span className="character-card-eyebrow">{copy.figureRole} <span aria-hidden="true">/</span> {eraLabel}</span>
+      <span className="character-card-eyebrow">{figureRole(figure.id, locale)} <span aria-hidden="true">/</span> {eraLabel}</span>
       <span className="character-card-title">{figureText(figure, "name", locale)}</span>
       <span className="character-card-summary">{figureText(figure, "description", locale)}</span>
       <span className="character-card-footer"><span>{eventCount}</span><span aria-hidden="true">↗</span></span>
     </span>
-    <span className="character-card-art-label">{artwork.label[locale]}</span>
+    <span className="character-card-art-label">{artwork?.label[locale] ?? copy.figureNoPortrait}</span>
   </button></li>;
 }
 
@@ -87,6 +100,7 @@ function CompareEraSummary({ era, data, status, locale, onExplore, tone }: {
   return <section className={`compare-era compare-era-${tone}`}>
     <div className="compare-era-heading"><span className="compare-swatch" aria-hidden="true" /><div><span>{tone === "first" ? copy.compareFirst : copy.compareSecond}</span><h2>{eraText(era, "label", locale)}</h2></div></div>
     <p>{eraText(era, "description", locale)}</p>
+    {data && data.territories.features.length === 0 && <p className="certainty-note">{copy.noTerritories}</p>}
     {data ? highlights.length ? <ol className="compare-highlights">{highlights.map((feature) => {
       const source = sources.find((item) => feature.properties.sourceIds.includes(item.id));
       return <li key={feature.properties.id}><span>{eventText(feature.properties, "dateLabel", locale)}</span><strong>{eventText(feature.properties, "name", locale)}</strong>
@@ -140,6 +154,11 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const activeEvent = events.find((feature) => feature.properties.id === selectedEventId);
   const eraFigures = figures.filter((figure) => figure.eraIds.includes(selectedId));
   const activeFigure = eraFigures.find((figure) => figure.id === selectedFigureId);
+  const activeFigureVisual = activeFigure ? figureArtwork[activeFigure.id] ?? figureHistoryImages[activeFigure.id] : undefined;
+  const activeEventVisual = activeEvent ? eventHistoryImages[activeEvent.properties.id] : undefined;
+  const activeEraVisual = eraHistoryImages[selectedId];
+  const selectedHasTerritory = Boolean(data?.territories.features.length);
+  const compareHasTerritory = Boolean(compareData?.territories.features.length);
   const highlights = events.filter((feature) => feature.properties.highlightRank !== null && feature.properties.highlightRank !== undefined)
     .sort((a, b) => (a.properties.highlightRank ?? 0) - (b.properties.highlightRank ?? 0));
 
@@ -318,12 +337,12 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     </header>
     <div className="atlas-workspace">
       <nav className="timeline-region" aria-label={copy.timelineLabel}>
-        <div className="section-heading"><h2>{copy.periods}</h2><span>{formatCount(locale, 3, copy.cuts.split("|") as [string, string, string])}</span></div>
+        <div className="section-heading"><h2>{copy.periods}</h2><span>{formatCount(locale, historicalEras.length, copy.cuts.split("|") as [string, string, string])}</span></div>
         <div className="timeline" role="group" aria-label={copy.timelineGroup}>
           {historicalEras.map((era, index) => <button
             key={era.id} type="button" className={`timeline-option${selectedId === era.id ? " is-active" : ""}`}
             aria-pressed={selectedId === era.id} onClick={() => selectEra(era.id)}>
-            <span className="timeline-index" aria-hidden="true">0{index + 1}</span><span className="timeline-dot" aria-hidden="true" /><span>{eraText(era, "label", locale)}</span>
+            <span className="timeline-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><span className="timeline-dot" aria-hidden="true" /><span>{eraText(era, "label", locale)}</span>
           </button>)}
         </div>
         {selectedEra.kind === "historical-reconstruction" && <button type="button" className={`compare-toggle${compareOpen ? " is-active" : ""}`}
@@ -338,9 +357,9 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           <label>{copy.compareSecond}<select value={compareId} onChange={(event) => { setCompareData(null); setCompareId(event.target.value); }}>
             {historicalEras.filter((era) => era.id !== selectedId).map((era) => <option key={era.id} value={era.id}>{eraText(era, "label", locale)}</option>)}
           </select></label>
-          <div className="compare-range"><label htmlFor="compare-balance">{copy.compareBalance}</label><div><span>{copy.compareEarlier}</span>
+          {selectedHasTerritory && compareHasTerritory && <div className="compare-range"><label htmlFor="compare-balance">{copy.compareBalance}</label><div><span>{copy.compareEarlier}</span>
             <input id="compare-balance" type="range" min="0" max="100" value={compareBalance} onChange={(event) => setCompareBalance(Number(event.target.value))} />
-            <span>{copy.compareLater}</span></div></div>
+            <span>{copy.compareLater}</span></div></div>}
         </div>}
         {process.env.NODE_ENV === "development" && <button type="button" className={`fixture-option${selectedId === "technical-fixture" ? " is-active" : ""}`}
           aria-pressed={selectedId === "technical-fixture"} onClick={() => selectEra("technical-fixture")}>
@@ -363,10 +382,10 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         {loadState === "ready" && !compareOpen && selectedEra.kind === "historical-reconstruction" && locatedCount === 0
           && <div className="map-empty" role="status">{copy.mapNoLocatedEvents}</div>}
         {selectedEra.kind === "historical-reconstruction" && <div className={`map-legend${compareOpen ? " is-comparing" : ""}`}>
-          {compareOpen ? <><span className="compare-legend-item"><i className="compare-swatch" aria-hidden="true" />{eraText(selectedEra, "label", locale)}</span>
-            <span className="compare-legend-item"><i className="compare-swatch compare-swatch-second" aria-hidden="true" />{eraText(compareEra, "label", locale)}</span>
-            <span className="compare-legend-note">{copy.boundaryApprox} · <a href={territorySource?.url} target="_blank" rel="noopener noreferrer">Seshat ↗</a></span></>
-            : <><span className="legend-line" aria-hidden="true" />{copy.approxReconstruction}
+          {compareOpen ? <>{selectedHasTerritory && <span className="compare-legend-item"><i className="compare-swatch" aria-hidden="true" />{eraText(selectedEra, "label", locale)}</span>}
+            {compareHasTerritory && <span className="compare-legend-item"><i className="compare-swatch compare-swatch-second" aria-hidden="true" />{eraText(compareEra, "label", locale)}</span>}
+            <span className="compare-legend-note">{selectedHasTerritory || compareHasTerritory ? copy.boundaryApprox : copy.noTerritories}{(selectedHasTerritory || compareHasTerritory) && territorySource && <> · <a href={territorySource.url} target="_blank" rel="noopener noreferrer">Seshat ↗</a></>}</span></>
+            : <>{selectedHasTerritory ? <><span className="legend-line" aria-hidden="true" />{copy.approxReconstruction}</> : copy.noTerritories}
               {events.some((feature) => feature.geometry) && <span className="legend-marker">{copy.approxMarker}</span>}</>}
         </div>}
         {selectedEra.kind === "technical-fixture" && <div className="map-fixture-label">{copy.fixtureMapLabel}</div>}
@@ -376,7 +395,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         <div className="panel-overline">{compareOpen ? copy.compareMode : activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
         {compareOpen ? <section className="compare-panel" aria-labelledby="panel-title">
           <h1 id="panel-title">{copy.compareTitle}</h1><p className="panel-intro">{copy.compareIntro}</p>
-          <p className="certainty-note">{copy.boundaryApprox}</p>
+          <p className="certainty-note">{selectedHasTerritory || compareHasTerritory ? copy.boundaryApprox : copy.noTerritories}</p>
           <CompareEraSummary era={selectedEra} data={data} status={loadState} locale={locale} tone="first" onExplore={() => setCompareOpen(false)} />
           {compareState === "error" && <div className="data-message" role="alert">{copy.compareError} <button type="button" className="retry-button" onClick={() => setRetry((value) => value + 1)}>{copy.retry}</button></div>}
           <CompareEraSummary era={compareEra} data={compareData} status={compareState} locale={locale} tone="second" onExplore={() => { setCompareOpen(false); selectEra(compareId); }} />
@@ -392,6 +411,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           <span className="event-detail-category">{categoryLabels[eventCategory(activeEvent.properties.id)]}</span>
           <h1 id="panel-title">{eventText(activeEvent.properties, "name", locale)}</h1>
           <p className="detail-date">{eventText(activeEvent.properties, "dateLabel", locale)}</p>
+          {activeEventVisual && <figure className="history-visual"><div><Image src={activeEventVisual.src} alt={activeEventVisual.caption[locale]} fill sizes="(max-width: 960px) 100vw, 400px" style={{ objectPosition: activeEventVisual.position }} /></div>
+            <figcaption><strong>{activeEventVisual.label[locale]}</strong> {activeEventVisual.caption[locale]} <a href={activeEventVisual.sourceUrl} target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a> · <a href={activeEventVisual.licenseUrl} target="_blank" rel="noopener noreferrer">{activeEventVisual.license}</a> · {activeEventVisual.creator}</figcaption></figure>}
           <p className="detail-copy">{eventText(activeEvent.properties, "description", locale)}</p>
           {activeEvent.properties.placeLabel && <p className="detail-fact"><strong>{copy.place}</strong>{eventText(activeEvent.properties, "placeLabel", locale)}</p>}
           {activeEvent.properties.uncertaintyNote && <p className="detail-note"><strong>{copy.datingAccuracy}</strong>{formatDisplayText(eventText(activeEvent.properties, "uncertaintyNote", locale)!)}</p>}
@@ -421,10 +442,11 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           }}>
           <button className="back-link" type="button" onClick={closeFigure}>← {copy.backToPeriod} {eraText(selectedEra, "label", locale)}</button>
           <div className="character-hero">
-            <Image src={figureArtwork[activeFigure.id].src} alt={figureArtwork[activeFigure.id].caption[locale]} fill sizes="(max-width: 960px) 100vw, 400px" priority style={{ objectPosition: figureArtwork[activeFigure.id].position }} />
-            <div className="character-hero-heading"><span>{copy.figureRole} · {eraText(selectedEra, "label", locale)}</span><h1 id="panel-title">{figureText(activeFigure, "name", locale)}</h1></div>
+            {activeFigureVisual ? <Image src={activeFigureVisual.src} alt={activeFigureVisual.caption[locale]} fill sizes="(max-width: 960px) 100vw, 400px" priority style={{ objectPosition: activeFigureVisual.position }} />
+              : <span className="character-sigil" aria-hidden="true">{figureText(activeFigure, "name", locale).slice(0, 1)}</span>}
+            <div className="character-hero-heading"><span>{figureRole(activeFigure.id, locale)} · {eraText(selectedEra, "label", locale)}</span><h1 id="panel-title">{figureText(activeFigure, "name", locale)}</h1></div>
           </div>
-          <p className="character-image-caption"><strong>{figureArtwork[activeFigure.id].label[locale]}</strong>{figureArtwork[activeFigure.id].caption[locale]}</p>
+          <p className="character-image-caption"><strong>{activeFigureVisual?.label[locale] ?? copy.figureNoPortrait}</strong>{activeFigureVisual?.caption[locale] ?? copy.figureNoPortraitNote}</p>
           <section className="character-text-section" aria-labelledby="figure-biography-title">
             <h2 id="figure-biography-title">{copy.figureBiography}</h2>
             <p className="detail-copy">{figureText(activeFigure, "description", locale)}</p>
@@ -433,42 +455,54 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             <h2 id="figure-significance-title">{copy.figureSignificance}</h2>
             <p>{figureSignificance(activeFigure.id, locale)}</p>
           </section>
+          {activeFigure.eraIds.length > 1 && <section className="character-text-section" aria-label={copy.periods}>
+            <h2>{copy.periods}</h2>
+            <div className="character-era-links">{activeFigure.eraIds.filter((id) => id !== selectedId).map((id) => {
+              const era = eras.find((item) => item.id === id);
+              return era ? <button type="button" key={id} onClick={() => { selectEra(id); setSelectedFigureId(activeFigure.id); }}>{eraText(era, "label", locale)} ↗</button> : null;
+            })}</div>
+          </section>}
           <div className="panel-divider" />
           <section className="panel-section" aria-labelledby="related-events-title">
             <div className="section-heading"><h2 id="related-events-title">{copy.relatedEvents}</h2></div>
-            <ul className="content-list">{events.filter((feature) => activeFigure.eventIds.includes(feature.properties.id))
-              .map((feature) => <EventRow key={feature.properties.id} feature={feature} locale={locale} onSelect={() => openEvent(feature.properties.id)} />)}</ul>
+            {events.some((feature) => activeFigure.eventIds.includes(feature.properties.id))
+              ? <ul className="content-list">{events.filter((feature) => activeFigure.eventIds.includes(feature.properties.id))
+                .map((feature) => <EventRow key={feature.properties.id} feature={feature} locale={locale} onSelect={() => openEvent(feature.properties.id)} />)}</ul>
+              : <p className="empty-copy">{copy.noRelatedEvents}</p>}
           </section>
           <div className="panel-divider" />
           <section className="panel-section" aria-labelledby="figure-sources-title">
             <div className="section-heading"><h2 id="figure-sources-title">{copy.sources}</h2></div>
             <SourceLinks ids={activeFigure.sourceIds} locale={locale} />
           </section>
-          <div className="panel-divider" />
+          {activeFigureVisual && <><div className="panel-divider" />
           <section className="panel-section" aria-labelledby="figure-artwork-title">
             <div className="section-heading"><h2 id="figure-artwork-title">{copy.figureArtworkSource}</h2></div>
-            <p className="character-artwork-credit">{copy.figureArtworkCredit}: {figureArtwork[activeFigure.id].creator}. <a href={figureArtwork[activeFigure.id].sourceUrl} target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a> · <a href={figureArtwork[activeFigure.id].licenseUrl} target="_blank" rel="noopener noreferrer">{figureArtwork[activeFigure.id].license}</a>. {copy.figureArtworkCrop}</p>
-          </section>
+            <p className="character-artwork-credit">{copy.figureArtworkCredit}: {activeFigureVisual.creator}. <a href={activeFigureVisual.sourceUrl} target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a> · <a href={activeFigureVisual.licenseUrl} target="_blank" rel="noopener noreferrer">{activeFigureVisual.license}</a>. {copy.figureArtworkCrop}</p>
+          </section></>}
         </section> : <>
           <h1 id="panel-title">{copy.atlasTitle}</h1>
           <p className="panel-intro">{copy.atlasIntro}</p>
           <div className="panel-divider" />
           <section className="panel-section data-section" aria-labelledby="territory-title" aria-live="polite">
-            <div className="section-heading"><h2 id="territory-title">{eraText(selectedEra, "label", locale)}</h2><span>{selectedEra.kind === "technical-fixture" ? copy.test : copy.reconstruction}</span></div>
+            <div className="section-heading"><h2 id="territory-title">{eraText(selectedEra, "label", locale)}</h2><span>{selectedEra.kind === "technical-fixture" ? copy.test : selectedHasTerritory ? copy.reconstruction : copy.events}</span></div>
             <p className="era-description">{eraText(selectedEra, "description", locale)}</p>
+            {activeEraVisual && <figure className="history-visual era-visual"><div><Image src={activeEraVisual.src} alt={activeEraVisual.caption[locale]} fill sizes="(max-width: 960px) 100vw, 340px" style={{ objectPosition: activeEraVisual.position }} /></div>
+              <figcaption><strong>{activeEraVisual.label[locale]}</strong> {activeEraVisual.caption[locale]} <a href={activeEraVisual.sourceUrl} target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a> · <a href={activeEraVisual.licenseUrl} target="_blank" rel="noopener noreferrer">{activeEraVisual.license}</a></figcaption></figure>}
             {loadState === "loading" && <p className="data-message" role="status">{copy.loadingLayer}</p>}
             {loadState === "error" && <div className="data-message" role="alert"><p>{copy.dataError}</p><button type="button" className="retry-button" onClick={() => setRetry((value) => value + 1)}>{copy.retry}</button></div>}
             {loadState === "empty" && <p className="data-message">{copy.noData}</p>}
             {loadState === "ready" && data && <>
-              <p className="territory-count">{data.territories.features.length === 0 ? copy.noTerritories : data.territories.features.map((feature) => territoryText(feature.properties, locale)).join(", ")}</p>
-              <p className="certainty-note">{selectedEra.kind === "technical-fixture" ? copy.fixtureCoordinates : copy.boundaryApprox}</p>
+              {data.territories.features.length > 0 && <p className="territory-count">{data.territories.features.map((feature) => territoryText(feature.properties, locale)).join(", ")}</p>}
+              <p className="certainty-note">{selectedEra.kind === "technical-fixture" ? copy.fixtureCoordinates : selectedHasTerritory ? copy.boundaryApprox : copy.noTerritories}</p>
             </>}
+            {selectedEra.kind === "historical-reconstruction" && <SourceLinks ids={selectedEra.sourceIds} locale={locale} />}
           </section>
           {selectedEra.kind === "historical-reconstruction" && <>
             <div className="panel-divider" />
             <section className="panel-section" aria-labelledby="highlights-title">
               <div className="section-heading"><h2 id="highlights-title">{copy.highlights}</h2>{loadState === "ready" && <span>{formatCount(locale, highlights.length, copy.highlightUnits.split("|") as [string, string, string])}</span>}</div>
-              {loadState === "ready" && highlights.length ? <ol className="content-list highlight-list">{highlights.map((feature) => <EventRow key={feature.properties.id} feature={feature} locale={locale} onSelect={() => openEvent(feature.properties.id)} />)}</ol> : <p className="empty-copy">{loadState === "loading" ? copy.loadingEvents : copy.noHighlights}</p>}
+              {loadState === "ready" && highlights.length ? <ol className="content-list highlight-list">{highlights.map((feature) => <EventRow key={feature.properties.id} feature={feature} locale={locale} onSelect={() => openEvent(feature.properties.id)} illustrated />)}</ol> : <p className="empty-copy">{loadState === "loading" ? copy.loadingEvents : copy.noHighlights}</p>}
             </section>
           </>}
           <div className="panel-divider" />
@@ -490,7 +524,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         </>}
         <div className="panel-footnote">
           <p>{copy.baseMapCredit}</p>
-          {territorySource && <p>{copy.historicalPolygons} <a href={territorySource.url} target="_blank" rel="noopener noreferrer">{sourceTitle(territorySource.id, territorySource.title, locale)}</a>. {copy.license} <a href={territorySource.licenseUrl} target="_blank" rel="noopener noreferrer">{territorySource.license}</a>. {copy.coordinatesUnchanged} {formatAccessDate(locale, territorySource.accessedOn)}.</p>}
+          {selectedHasTerritory && territorySource && <p>{copy.historicalPolygons} <a href={territorySource.url} target="_blank" rel="noopener noreferrer">{sourceTitle(territorySource.id, territorySource.title, locale)}</a>. {copy.license} <a href={territorySource.licenseUrl} target="_blank" rel="noopener noreferrer">{territorySource.license}</a>. {copy.coordinatesUnchanged} {formatAccessDate(locale, territorySource.accessedOn)}.</p>}
           <p>{copy.originalSourceTitles}</p>
           {locale !== "ru" && <p>{copy.translationReview}</p>}
           <nav className="panel-legal-links" aria-label={legal[locale].legalNavigation}>

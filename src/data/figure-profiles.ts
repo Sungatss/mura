@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n";
+import { figureExpansionCopy } from "@/data/figure-expansion-copy";
 
 // Short editorial readings of the existing sourced figure and event summaries.
 const significance: Record<string, Record<Locale, string>> = {
@@ -35,5 +36,5 @@ const significance: Record<string, Record<Locale, string>> = {
 };
 
 export function figureSignificance(id: string, locale: Locale): string {
-  return significance[id]?.[locale] ?? "";
+  return significance[id]?.[locale] ?? figureExpansionCopy[id as keyof typeof figureExpansionCopy]?.significance[locale] ?? "";
 }

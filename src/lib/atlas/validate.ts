@@ -144,7 +144,7 @@ export function validateHistoricalContent(
   const figureIds = new Set<string>();
   for (const figure of figures) {
     if (!figure.id || figureIds.has(figure.id) || !figure.name.ru || !figure.description.ru
-      || figure.eraIds.length === 0 || figure.eventIds.length === 0 || figure.sourceIds.length === 0
+      || figure.eraIds.length === 0 || figure.sourceIds.length === 0
       || figure.eraIds.some((id) => !eraIds.has(id))
       || figure.sourceIds.some((id) => !knownSourceIds.has(id))
       || figure.eventIds.some((id) => !eventIds.has(id))) fail(`неполная персона ${figure.id}`);

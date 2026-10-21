@@ -1,0 +1,183 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "chebukov-embassy-1573",
+        "eraId": "kazakh-1556-1598",
+        "kind": "event",
+        "name": {
+          "ru": "Неудавшаяся московская миссия",
+          "kk": "Мәскеу елшілігінің сәтсіз аяқталуы",
+          "en": "Moscow mission fails to reach the khanate"
+        },
+        "dateLabel": {
+          "ru": "1573",
+          "kk": "1573",
+          "en": "1573"
+        },
+        "description": {
+          "ru": "Посольство Третьяка Чебукова отправилось для налаживания торговли с казахами, но было уничтожено до прибытия. Эпизод показывает ранний интерес Москвы к прямым связям с ханством.",
+          "kk": "Третьяк Чебуков елшілігі қазақтармен сауда байланысын орнатуға аттанды, бірақ жетпей жойылды. Бұл Мәскеудің хандықпен тікелей байланысқа ерте қызыққанын көрсетеді.",
+          "en": "Tretiak Chebukov’s embassy set out to develop trade with the Kazakhs but was destroyed before arrival. The episode shows Moscow’s early interest in direct contact with the khanate."
+        },
+        "startYear": 1573,
+        "endYear": 1573,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-foreign-relations"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "shigay-campaign-1582",
+        "eraId": "kazakh-1556-1598",
+        "kind": "event",
+        "name": {
+          "ru": "Поход Шигая против Баба-султана",
+          "kk": "Шығайдың Баба сұлтанға қарсы жорығы",
+          "en": "Shigay’s campaign against Baba Sultan"
+        },
+        "dateLabel": {
+          "ru": "1582",
+          "kk": "1582",
+          "en": "1582"
+        },
+        "description": {
+          "ru": "Шигай и его сын Тауекель поддержали бухарского правителя в борьбе с Баба-султаном. Тауекель убил Баба-султана при отступлении; борьба за города Сырдарьи продолжилась.",
+          "kk": "Шығай мен ұлы Тәуекел Бұхара билеушісін Баба сұлтанға қарсы күресте қолдады. Шегіну кезінде Тәуекел Баба сұлтанды өлтірді; Сырдария қалалары үшін күрес жалғасты.",
+          "en": "Shigay and his son Tauekel supported the Bukhara ruler against Baba Sultan. Tauekel killed Baba Sultan during the retreat, while the contest for Syr Darya towns continued."
+        },
+        "startYear": 1582,
+        "endYear": 1582,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "tauekel"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tauekel-cities-1586",
+        "eraId": "kazakh-1556-1598",
+        "kind": "event",
+        "name": {
+          "ru": "Тауекель занимает города Туркестана",
+          "kk": "Тәуекел Түркістан өңіріндегі қалаларды алды",
+          "en": "Tauekel captures Turkestan towns"
+        },
+        "dateLabel": {
+          "ru": "1586",
+          "kk": "1586",
+          "en": "1586"
+        },
+        "description": {
+          "ru": "Тауекель захватил ряд городов Туркестана и попытался взять Ташкент. Соперничество за южные торговые центры оставалось ключевой частью политики ханства.",
+          "kk": "Тәуекел Түркістандағы бірнеше қаланы алып, Ташкентті алуға тырысты. Оңтүстіктегі сауда орталықтары үшін бәсеке хандық саясатының маңызды бөлігі болып қалды.",
+          "en": "Tauekel captured several Turkestan towns and attempted to take Tashkent. Competition for the southern trade centres remained central to khanate politics."
+        },
+        "startYear": 1586,
+        "endYear": 1586,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "tauekel"
+        ],
+        "highlightRank": 3,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kazakh-embassy-moscow-1594",
+        "eraId": "kazakh-1556-1598",
+        "kind": "event",
+        "name": {
+          "ru": "Первое казахское посольство в Москве",
+          "kk": "Қазақ елшілігінің Мәскеуге алғашқы сапары",
+          "en": "First Kazakh embassy reaches Moscow"
+        },
+        "dateLabel": {
+          "ru": "1594",
+          "kk": "1594",
+          "en": "1594"
+        },
+        "description": {
+          "ru": "Посланник Тауекеля Кул-Мухаммед добивался освобождения Ураз-Мухаммеда и дружественного соглашения. Миссия стала важным этапом прямой казахско-русской дипломатии.",
+          "kk": "Тәуекелдің елшісі Құл-Мұхаммед Ораз-Мұхаммедті босатуға және достық келісімге қол жеткізуге ұмтылды. Елшілік қазақ-орыс тікелей дипломатиясының маңызды кезеңі болды.",
+          "en": "Tauekel’s envoy Kul-Muhammad sought the release of Uraz-Muhammad and a friendly agreement. The mission marked an important stage in direct Kazakh-Russian diplomacy."
+        },
+        "startYear": 1594,
+        "endYear": 1594,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "tauekel"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-foreign-relations"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "tauekel-final-campaign-1598",
+        "eraId": "kazakh-1556-1598",
+        "kind": "event",
+        "name": {
+          "ru": "Последний поход Тауекеля",
+          "kk": "Тәуекелдің соңғы жорығы",
+          "en": "Tauekel’s final campaign"
+        },
+        "dateLabel": {
+          "ru": "1598",
+          "kk": "1598",
+          "en": "1598"
+        },
+        "description": {
+          "ru": "Тауекель занял несколько городов Средней Азии в ходе похода против Шайбанидов, но получил тяжёлое ранение и умер. После его смерти власть перешла к Есиму.",
+          "kk": "Тәуекел Шайбанилерге қарсы жорықта Орта Азияның бірнеше қаласын алды, бірақ ауыр жараланып қайтыс болды. Одан кейін билік Есімге өтті.",
+          "en": "Tauekel took several Central Asian towns during his campaign against the Shaybanids, but was seriously wounded and died. Esim succeeded him."
+        },
+        "startYear": 1598,
+        "endYear": 1598,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "tauekel"
+        ],
+        "highlightRank": null,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

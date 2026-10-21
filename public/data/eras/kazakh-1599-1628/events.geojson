@@ -1,0 +1,77 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "esim-turkestan-agreement",
+        "eraId": "kazakh-1599-1628",
+        "kind": "event",
+        "name": {
+          "ru": "Соглашение Есима о южных городах",
+          "kk": "Есімнің оңтүстік қалалар жөніндегі келісімі",
+          "en": "Esim’s agreement over southern towns"
+        },
+        "dateLabel": {
+          "ru": "1599",
+          "kk": "1599",
+          "en": "1599"
+        },
+        "description": {
+          "ru": "После смены династии в Бухаре Есим достиг соглашения, по которому Туркестанские города вошли в сферу ханства. Условия власти над Ташкентом оставались спорными.",
+          "kk": "Бұхарада әулет ауысқаннан кейін Есім Түркістан қалалары хандық ықпалына кіретін келісімге жетті. Ташкенттегі билік шарттары даулы болып қалды.",
+          "en": "After the dynastic change in Bukhara, Esim reached an agreement bringing Turkestan towns into the khanate’s sphere. Authority over Tashkent remained contested."
+        },
+        "startYear": 1599,
+        "endYear": 1599,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "esim"
+        ],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-political-history"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "esim-tashkent-rivalry",
+        "eraId": "kazakh-1599-1628",
+        "kind": "event",
+        "name": {
+          "ru": "Соперничество за Ташкент при Есиме",
+          "kk": "Есім тұсындағы Ташкент үшін бәсеке",
+          "en": "Rivalry over Tashkent under Esim"
+        },
+        "dateLabel": {
+          "ru": "1606–1628",
+          "kk": "1606–1628",
+          "en": "1606–1628"
+        },
+        "description": {
+          "ru": "Есим соперничал за Ташкент с бухарскими правителями и с казахским правителем Турсуном. Затяжной спор показывал нестабильность власти над важным торговым городом.",
+          "kk": "Есім Ташкент үшін Бұхара билеушілерімен және қазақ билеушісі Тұрсынмен бәсекелесті. Ұзақ тартыс маңызды сауда қаласындағы биліктің тұрақсыздығын көрсетті.",
+          "en": "Esim contested Tashkent with Bukhara’s rulers and with the Kazakh ruler Tursun. The prolonged dispute showed how unstable authority over this major trade city remained."
+        },
+        "startYear": 1606,
+        "endYear": 1628,
+        "certainty": "approximate",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "esim"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-seventeenth"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "dzungar-khanate-1635",
+        "eraId": "kazakh-1629-1679",
+        "kind": "event",
+        "name": {
+          "ru": "Образование Джунгарского ханства",
+          "kk": "Жоңғар хандығының құрылуы",
+          "en": "Formation of the Dzungar Khanate"
+        },
+        "dateLabel": {
+          "ru": "1635",
+          "kk": "1635",
+          "en": "1635"
+        },
+        "description": {
+          "ru": "Объединение ойратских групп привело к возникновению Джунгарского ханства. Новый сосед усилил давление на кочевые территории Казахского ханства.",
+          "kk": "Ойрат топтарының бірігуі Жоңғар хандығының пайда болуына әкелді. Жаңа көрші Қазақ хандығының көшпелі аймақтарына қысымды күшейтті.",
+          "en": "The consolidation of Oirat groups produced the Dzungar Khanate. The new neighbour increased pressure on the Kazakh Khanate’s nomadic lands."
+        },
+        "startYear": 1635,
+        "endYear": 1635,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [],
+        "highlightRank": 1,
+        "sourceIds": [
+          "eh-seventeenth"
+        ]
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "orbulak-1643",
+        "eraId": "kazakh-1629-1679",
+        "kind": "event",
+        "name": {
+          "ru": "Сражение 1643 года при Жангире",
+          "kk": "Жәңгір кезіндегі 1643 жылғы шайқас",
+          "en": "Jangir’s battle against Dzungar forces"
+        },
+        "dateLabel": {
+          "ru": "1643",
+          "kk": "1643",
+          "en": "1643"
+        },
+        "description": {
+          "ru": "Жангир организовал сопротивление вторжению джунгарских войск; ему помогли киргизские отряды и союзники из Бухары. Этот эпизод известен как Орбулакское сражение, но точная точка боя здесь не заявляется.",
+          "kk": "Жәңгір жоңғар әскерінің шапқыншылығына қарсы қорғанысты ұйымдастырды; қырғыз жасақтары мен Бұхара одақтастары көмектесті. Бұл оқиға Орбұлақ шайқасы ретінде белгілі, бірақ мұнда нақты шайқас орны көрсетілмейді.",
+          "en": "Jangir organized resistance to a Dzungar invasion with help from Kyrgyz fighters and Bukhara allies. This episode is known as the Battle of Orbulak; its exact battlefield is not claimed here."
+        },
+        "startYear": 1643,
+        "endYear": 1643,
+        "certainty": "verified",
+        "coordinateStatus": "not-mapped",
+        "coordinateSourceIds": [],
+        "figureIds": [
+          "jangir"
+        ],
+        "highlightRank": 2,
+        "sourceIds": [
+          "eh-seventeenth",
+          "eh-jangir"
+        ]
+      },
+      "geometry": null
+    }
+  ]
+}

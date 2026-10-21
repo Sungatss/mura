@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import assert from "node:assert/strict";
 import ts from "typescript";
@@ -13,6 +13,7 @@ async function loadTypeScript(path) {
 
 const { eras, sources } = await loadTypeScript("../src/data/atlas.ts");
 const { figures } = await loadTypeScript("../src/data/figures.ts");
+const { historyImages } = await loadTypeScript("../src/data/history-images.ts");
 const { validateCatalog, validateEraData, validateHistoricalContent } = await loadTypeScript("../src/lib/atlas/validate.ts");
 
 validateCatalog(eras, sources);
@@ -28,15 +29,39 @@ for (const era of eras) {
   const events = await readGeoJSON(era.eventUrl);
   datasets.push(validateEraData(era, territories, events, knownSources));
   if (era.kind === "historical-reconstruction") {
-    assert.equal(territories.features.length, 1, `${era.id}: expected one sourced territory`);
+    assert.ok(events.features.length > 0, `${era.id}: a historical period needs sourced events`);
+    assert.ok(territories.features.every((feature) => feature.properties.sourceIds.length > 0),
+      `${era.id}: historical boundaries must be sourced`);
   }
   console.log(`${era.id}: ${territories.features.length} territories, ${events.features.length} events`);
 }
 validateHistoricalContent(eras, datasets, figures, knownSources);
-assert.deepEqual(datasets.slice(0, 3).map((data) => data.events.features.length), [3, 4, 5]);
-assert.equal(figures.length, 6);
-assert.equal(datasets.slice(0, 3).flatMap((data) => data.events.features).filter((event) => event.geometry !== null).length, 1);
-console.log("Historical content: 12 events, 6 linked figures, 1 sourced approximate marker.");
+const historicalDatasets = datasets.filter((_, index) => eras[index].kind === "historical-reconstruction");
+const historicalEvents = historicalDatasets.flatMap((data) => data.events.features);
+const mappedEvents = historicalEvents.filter((event) => event.geometry !== null);
+console.log(`Historical content: ${historicalDatasets.length} eras, ${historicalEvents.length} events, ${figures.length} figures, ${mappedEvents.length} sourced map markers.`);
+
+const eraIds = new Set(eras.filter((era) => era.kind === "historical-reconstruction").map((era) => era.id));
+const eventIds = new Set(historicalEvents.map((event) => event.properties.id));
+const figureIds = new Set(figures.map((figure) => figure.id));
+const imageIds = new Set();
+for (const image of historyImages) {
+  assert.ok(image.id && !imageIds.has(image.id), `duplicate history image ${image.id}`);
+  imageIds.add(image.id);
+  assert.match(image.src, /^\/history\/[a-z0-9-]+\.webp$/, `${image.id}: image must be a local WebP`);
+  assert.ok(["artifact-copy", "attributed-artifact", "museum-display", "modern-photograph"].includes(image.kind), `${image.id}: image kind missing`);
+  assert.ok(image.creator?.trim() && image.sourceUrl?.startsWith("https://commons.wikimedia.org/wiki/File:")
+    && image.license?.trim() && image.licenseUrl?.startsWith("https://creativecommons.org/"), `${image.id}: missing image credit or license`);
+  assert.ok(image.figureIds.length + image.eventIds.length + image.eraIds.length > 0, `${image.id}: image has no subject`);
+  assert.ok(image.figureIds.every((id) => figureIds.has(id)) && image.eventIds.every((id) => eventIds.has(id))
+    && image.eraIds.every((id) => eraIds.has(id)), `${image.id}: unsupported image relationship`);
+  for (const locale of ["ru", "kk", "en"]) {
+    assert.ok(image.label?.[locale]?.trim() && image.caption?.[locale]?.trim(), `${image.id}: missing ${locale} label or caption`);
+  }
+  const asset = await stat(resolve(`public${image.src}`));
+  assert.ok(asset.size > 1000 && asset.size < 500000, `${image.id}: asset is missing, empty, or unoptimized`);
+}
+console.log(`Image catalog valid: ${historyImages.length} local licensed assets.`);
 
 const fixture = eras.find((era) => era.id === "technical-fixture");
 const validFixture = await readGeoJSON(fixture.territoryUrl);
@@ -48,7 +73,8 @@ assert.throws(
 );
 console.log("Validation rejected an out-of-range coordinate.");
 
-const historical = eras[0];
+const historical = eras.find((era, index) => era.kind === "historical-reconstruction" && datasets[index].territories.features.length > 0);
+assert.ok(historical, "at least one verified territorial reconstruction is needed for the boundary checks");
 const unsourced = await readGeoJSON(historical.territoryUrl);
 unsourced.features[0].properties.sourceIds = [];
 assert.throws(

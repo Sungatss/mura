@@ -13,6 +13,7 @@
     "validate:i18n": "node scripts/validate-i18n.mjs",
     "validate:learning": "node scripts/validate-learning.mjs",
     "test:learning": "node tests/learning.test.mjs",
+    "test:shezhire": "node tests/shezhire.test.mjs",
     "test:guide": "tsc src/lib/guide/validation.ts --module commonjs --target es2022 --skipLibCheck --outDir .next/guide-test && node tests/guide-validation.test.mjs"
   },
   "dependencies": {

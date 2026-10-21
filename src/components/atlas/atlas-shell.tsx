@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { GuidePanel } from "./guide-panel";
 import { LearningPanel } from "./learning-panel";
 import { MapCanvas } from "./map-canvas";
+import { ShezhirePanel } from "./shezhire-panel";
 import { eras, sources } from "@/data/atlas";
 import { eventCategory, type EventCategory } from "@/data/event-categories";
 import { figures } from "@/data/figures";
@@ -113,9 +114,11 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const [retry, setRetry] = useState(0);
   const [guideOpen, setGuideOpen] = useState(false);
   const [learningOpen, setLearningOpen] = useState(false);
+  const [shezhireOpen, setShezhireOpen] = useState(false);
   const panelRef = useRef<HTMLElement>(null);
   const closeGuide = useCallback(() => setGuideOpen(false), []);
   const closeLearning = useCallback(() => setLearningOpen(false), []);
+  const closeShezhire = useCallback(() => setShezhireOpen(false), []);
   const copy = ui[locale];
   const selectedEra = eras.find((era) => era.id === selectedId) ?? eras[0];
   const compareEra = eras.find((era) => era.id === compareId) ?? eras[1];
@@ -171,6 +174,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
       setClosingFigureId(null);
       setGuideOpen(false);
       setLearningOpen(false);
+      setShezhireOpen(false);
     }
     setCompareOpen((current) => !current);
   }
@@ -180,6 +184,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     if (selected?.geometry && categoryFilter !== "all" && eventCategory(id) !== categoryFilter) setCategoryFilter("all");
     setGuideOpen(false);
     setLearningOpen(false);
+    setShezhireOpen(false);
     setSelectedFigureId(null);
     setClosingFigureId(null);
     setClosingEventId(null);
@@ -198,10 +203,23 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   }
 
   function openFigure(id: string) {
+    setShezhireOpen(false);
     setSelectedEventId(null);
     setClosingEventId(null);
     setClosingFigureId(null);
     setSelectedFigureId(id);
+  }
+
+  function exploreShezhireFigure(id: string) {
+    selectEra("kazakh-1721-1737");
+    setCompareOpen(false);
+    openFigure(id);
+    if (window.matchMedia("(max-width: 960px)").matches) {
+      requestAnimationFrame(() => panelRef.current?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      }));
+    }
   }
 
   function closeFigure() {
@@ -289,9 +307,11 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             aria-pressed={locale === option} onClick={() => setLocalePreference(option)}>{option.toUpperCase()}</button>)}
         </div>
         <button type="button" className="guide-trigger" aria-expanded={guideOpen} aria-controls="guide-title"
-          onClick={() => { setLearningOpen(false); setGuideOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M5 4h14v12H9l-4 4V4Z" /><path d="M9 8h6M9 12h4" /></svg>{copy.guideTrigger}</button>
+          onClick={() => { setLearningOpen(false); setShezhireOpen(false); setGuideOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M5 4h14v12H9l-4 4V4Z" /><path d="M9 8h6M9 12h4" /></svg>{copy.guideTrigger}</button>
         <button type="button" className="guide-trigger" aria-expanded={learningOpen} aria-controls="learn-title"
-          onClick={() => { setGuideOpen(false); setLearningOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M12 5C8 2 3 4 3 4v15s5-2 9 1c4-3 9-1 9-1V4s-5-2-9 1Zm0 0v15" /></svg>{copy.learnTrigger}</button>
+          onClick={() => { setGuideOpen(false); setShezhireOpen(false); setLearningOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M12 5C8 2 3 4 3 4v15s5-2 9 1c4-3 9-1 9-1V4s-5-2-9 1Zm0 0v15" /></svg>{copy.learnTrigger}</button>
+        <button type="button" className="guide-trigger" aria-expanded={shezhireOpen} aria-controls="shezhire-title"
+          onClick={() => { setGuideOpen(false); setLearningOpen(false); setShezhireOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="5" r="2" /><circle cx="5" cy="18" r="2" /><circle cx="19" cy="18" r="2" /><path d="M12 7v5M5 16v-4h14v4" /></svg>{copy.shezhireTrigger}</button>
       </div>
     </header>
     <div className="atlas-workspace">
@@ -349,8 +369,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         </div>}
         {selectedEra.kind === "technical-fixture" && <div className="map-fixture-label">{copy.fixtureMapLabel}</div>}
       </section>
-      <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : "panel-title"}>
-        <div className="atlas-panel-content" hidden={guideOpen || learningOpen}>
+      <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen || shezhireOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : shezhireOpen ? "shezhire-title" : "panel-title"}>
+        <div className="atlas-panel-content" hidden={guideOpen || learningOpen || shezhireOpen}>
         <div className="panel-overline">{compareOpen ? copy.compareMode : activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
         {compareOpen ? <section className="compare-panel" aria-labelledby="panel-title">
           <h1 id="panel-title">{copy.compareTitle}</h1><p className="panel-intro">{copy.compareIntro}</p>
@@ -481,6 +501,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           open={guideOpen} onClose={closeGuide} era={selectedEra} event={activeEvent} figure={activeFigure} loadState={loadState} locale={locale} />
         <LearningPanel key={`${selectedId}:${selectedFigureId ?? ""}`} open={learningOpen} onClose={closeLearning}
           era={selectedEra} figure={activeFigure} locale={locale} />
+        <ShezhirePanel open={shezhireOpen} onClose={closeShezhire} onExploreFigure={exploreShezhireFigure} locale={locale} />
       </aside>
     </div>
   </main>;

@@ -753,6 +753,65 @@ button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px sol
   .compare-legend-item { font-size: 9px; }
   .compare-legend-note { font-size: 9px; }
 }
+
+/* Shezhire is an educational record of groups, with no personal descent graph. */
+.shezhire-panel .guide-top h2 { font-size: 27px; }
+.shezhire-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px 24px 28px; scrollbar-width: thin; }
+.shezhire-intro { margin: 0; color: var(--muted); font: 14px/1.55 var(--serif); }
+.shezhire-boundary { margin: 16px 0 18px; padding: 12px 13px; border-left: 2px solid var(--gold); border-radius: 0 9px 9px 0; background: var(--surface); color: var(--muted); font: 11px/1.55 var(--sans); }
+.shezhire-search { display: grid; gap: 6px; color: var(--accent); font: 700 10px/1.3 var(--sans); letter-spacing: .04em; }
+.shezhire-search input { width: 100%; min-height: 40px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--input); color: var(--navy); font: 13px/1.3 var(--sans); outline: none; }
+.shezhire-search input:focus-visible { border-color: var(--gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 16%, transparent); }
+.shezhire-view { margin-top: 24px; animation: panel-enter 220ms ease both; }
+.shezhire-view h3 { margin: 0 0 12px; color: var(--navy); font: 400 27px/1.18 var(--serif); }
+.shezhire-view h4 { margin: 24px 0 10px; color: var(--accent); font: 700 11px/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+.shezhire-view > p { color: var(--muted); font: 13px/1.65 var(--sans); }
+.shezhire-zhuz-list { display: grid; gap: 10px; }
+.shezhire-zhuz-card { display: grid; gap: 8px; width: 100%; padding: 16px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--navy); text-align: left; cursor: pointer; box-shadow: var(--shadow); }
+.shezhire-zhuz-card:hover, .shezhire-zhuz-card:focus-visible { border-color: var(--gold); transform: translateY(-2px); }
+.shezhire-card-rule { width: 27px; height: 2px; background: var(--gold); }
+.shezhire-zhuz-card strong { font: 400 22px/1.18 var(--serif); }
+.shezhire-zhuz-card > span:nth-child(3) { color: var(--muted); font: 11px/1.5 var(--sans); }
+.shezhire-zhuz-card small { color: var(--accent); font: 700 10px/1.3 var(--sans); }
+.shezhire-breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin: 0 0 19px; color: var(--subtle); font: 10px/1.4 var(--sans); }
+.shezhire-breadcrumb button, .shezhire-back { padding: 3px 0; border: 0; background: transparent; color: var(--accent); font: inherit; cursor: pointer; }
+.shezhire-breadcrumb button:hover, .shezhire-back:hover { text-decoration: underline; text-underline-offset: 3px; }
+.shezhire-breadcrumb strong { color: var(--navy); font-weight: 700; }
+.shezhire-kicker { display: block; margin-bottom: 6px; color: var(--accent); font: 700 10px/1.3 var(--sans); letter-spacing: .1em; text-transform: uppercase; }
+.shezhire-sources { display: grid; gap: 7px; margin-top: 17px; padding-top: 13px; border-top: 1px solid var(--line); }
+.shezhire-sources > span { color: var(--accent); font: 700 10px/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+.shezhire-sources a, .shezhire-figure a { width: fit-content; color: var(--muted); font: 10px/1.45 var(--sans); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.shezhire-tree { display: grid; gap: 8px; margin: 0 0 0 8px; padding: 0 0 0 15px; border-left: 1px solid var(--gold); list-style: none; }
+.shezhire-tree li { position: relative; }
+.shezhire-node { position: absolute; left: -22px; top: 16px; width: 12px; height: 12px; border: 2px solid var(--gold); border-radius: 50%; background: var(--paper); }
+.shezhire-ru-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 55px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--navy); text-align: left; cursor: pointer; }
+.shezhire-ru-card:hover, .shezhire-ru-card:focus-visible { border-color: var(--gold); background: var(--paper); }
+.shezhire-ru-card strong { display: block; font: 400 17px/1.3 var(--serif); }
+.shezhire-ru-card small { display: block; margin-top: 2px; color: var(--muted); font: 10px/1.3 var(--sans); }
+.shezhire-ru-card > span:last-child { color: var(--accent); }
+.shezhire-association { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.shezhire-association strong { color: var(--navy); }
+.shezhire-detail-note { margin-top: 20px; color: var(--subtle) !important; font-size: 11px !important; }
+.shezhire-back { margin-top: 14px; font-size: 11px; }
+.shezhire-figure { display: grid; gap: 6px; margin-top: 19px; padding: 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.shezhire-figure > span { color: var(--accent); font: 700 10px/1.3 var(--sans); }
+.shezhire-figure strong { color: var(--navy); font: 400 17px/1.3 var(--serif); }
+.shezhire-figure p { margin: 0; color: var(--muted); font: 11px/1.5 var(--sans); }
+.shezhire-figure button { width: fit-content; margin-top: 3px; padding: 7px 10px; border: 1px solid var(--gold); border-radius: 7px; background: transparent; color: var(--accent); font: 700 10px/1.3 var(--sans); cursor: pointer; }
+.shezhire-figure button:hover { background: color-mix(in srgb, var(--gold) 12%, var(--paper)); }
+.shezhire-results { display: grid; gap: 7px; }
+.shezhire-results button { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--navy); text-align: left; cursor: pointer; }
+.shezhire-results button:hover { border-color: var(--gold); }
+.shezhire-results button span:first-child { grid-column: 1; color: var(--accent); font: 10px/1.3 var(--sans); }
+.shezhire-results button strong { grid-column: 1; font: 400 16px/1.3 var(--serif); }
+.shezhire-results button span:last-child { grid-column: 2; grid-row: 1 / 3; align-self: center; color: var(--accent); }
+@media (max-width: 600px) {
+  .header-actions { grid-template-columns: 38px repeat(2, minmax(0, 1fr)); }
+  .header-actions .locale-switch { grid-column: 2 / -1; justify-self: start; }
+  .header-actions .guide-trigger { justify-content: center; text-align: center; }
+  .shezhire-body { padding: 16px 18px 24px; }
+  .shezhire-panel .guide-top h2 { font-size: 24px; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .learn-flashcard-inner, .learn-flashcard.is-revealed .learn-flashcard-inner, .learn-flashcard-back { transform: none !important; }

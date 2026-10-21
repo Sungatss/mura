@@ -1,6 +1,6 @@
-import { AtlasShell } from "@/components/atlas/atlas-shell";
+import { MuraEntry } from "@/components/demo-entry";
 import { requestLocale } from "@/lib/i18n/server";
 
 export default async function Home() {
-  return <AtlasShell initialLocale={await requestLocale()} />;
+  return <MuraEntry initialLocale={await requestLocale()} />;
 }

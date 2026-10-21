@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-provider";
+import { DemoProfileMenu } from "@/components/demo-profile-menu";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GuidePanel } from "./guide-panel";
 import { LearningPanel } from "./learning-panel";
@@ -312,6 +313,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           onClick={() => { setGuideOpen(false); setShezhireOpen(false); setLearningOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M12 5C8 2 3 4 3 4v15s5-2 9 1c4-3 9-1 9-1V4s-5-2-9 1Zm0 0v15" /></svg>{copy.learnTrigger}</button>
         <button type="button" className="guide-trigger" aria-expanded={shezhireOpen} aria-controls="shezhire-title"
           onClick={() => { setGuideOpen(false); setLearningOpen(false); setShezhireOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="5" r="2" /><circle cx="5" cy="18" r="2" /><circle cx="19" cy="18" r="2" /><path d="M12 7v5M5 16v-4h14v4" /></svg>{copy.shezhireTrigger}</button>
+        <DemoProfileMenu locale={locale} />
       </div>
     </header>
     <div className="atlas-workspace">

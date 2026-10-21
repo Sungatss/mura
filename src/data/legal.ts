@@ -18,7 +18,7 @@ type LegalCopy = {
 
 export const legalOperator = "Linux Team";
 export const legalContact = "sliambekovsungat7@gmail.com";
-export const legalUpdatedOn = "2026-10-20";
+export const legalUpdatedOn = "2026-10-21";
 
 export const legal: Record<Locale, LegalCopy> = {
   ru: {
@@ -36,13 +36,17 @@ export const legal: Record<Locale, LegalCopy> = {
       intro: "Здесь описано, какие данные обрабатывает текущая версия МҰРА. Проект ведёт Linux Team. Вопросы по обработке данных можно отправить на указанный ниже адрес.",
       sections: [
         { heading: "Посещение сайта и карта", paragraphs: [
-          "Для загрузки страниц и исторических GeoJSON браузер обращается к серверу МҰРА. Хостинг может обрабатывать технические данные запросов, в том числе IP-адрес и сведения о браузере. В приложении нет аккаунтов или аналитических скриптов.",
+          "Для загрузки страниц и исторических GeoJSON браузер обращается к серверу МҰРА. Хостинг может обрабатывать технические данные запросов, в том числе IP-адрес и сведения о браузере. В приложении нет серверных аккаунтов или аналитических скриптов.",
           "Базовая карта загружается напрямую с OpenFreeMap. При этом браузер передаёт поставщику карты обычные данные сетевого запроса. Атрибуция картографических данных отображается на карте.",
         ] },
         { heading: "Исторический гид Gemini", paragraphs: [
           "Если вы отправляете вопрос гиду, сервер МҰРА передаёт Google Gemini текст вопроса, выбранные период, событие или персону, до четырёх предыдущих сообщений и проверенные краткие материалы выбранного периода с названиями источников. Ключ Gemini остаётся на сервере.",
           "МҰРА не сохраняет переписку в собственной базе данных. Сообщения находятся в памяти открытой страницы и исчезают после её перезагрузки или закрытия. Сервер не записывает текст вопросов в логи приложения намеренно. Хостинг и Google могут вести собственные технические журналы и обрабатывать данные по своим условиям.",
           "Условия обработки у Google различаются для бесплатной и платной квоты Gemini API. Тип квоты для публичного сайта может меняться; МҰРА не обещает отсутствие хранения или использования запросов Google. Не вводите личные, конфиденциальные или секретные сведения.",
+        ] },
+        { heading: "Демопрофиль", paragraphs: [
+          "Вход и регистрация работают в демонстрационном режиме: любые введённые данные подходят, пароль не проверяется. Поля телефона или email и пароля приложение не отправляет на сервер и не сохраняет. Сохранение паролей самим браузером зависит от его настроек.",
+          "Имя и указанный вами ру сохраняются только в localStorage этого браузера под ключом mura-demo-profile-v1. Ру указывается со слов пользователя и не подтверждает происхождение. При выходе локальный демопрофиль удаляется; защищённой учётной записи и синхронизации между устройствами нет.",
         ] },
         { heading: "Язык, тема и учебный прогресс", paragraphs: [
           "Выбранный язык хранится в localStorage и в cookie mura-locale сроком до одного года. Cookie помогает сразу открыть страницу на выбранном языке.",
@@ -71,7 +75,7 @@ export const legal: Record<Locale, LegalCopy> = {
           "Не отправляйте через гид персональные, секретные или конфиденциальные данные. Не используйте сервис для автоматизированной перегрузки API или противоправных действий.",
         ] },
         { heading: "Карточки и XP", paragraphs: [
-          "Тесты и карточки доступны без аккаунта. XP отражают только завершённые занятия в данном браузере, не имеют денежной стоимости и не дают призов или места в рейтинге. Очистка данных браузера удаляет прогресс.",
+          "После демо-входа тесты и карточки доступны без защищённой учётной записи. XP отражают только завершённые занятия в данном браузере, не привязаны к демопрофилю, не имеют денежной стоимости и не дают призов или места в рейтинге. Очистка данных браузера удаляет прогресс.",
         ] },
         { heading: "Источники и права", paragraphs: [
           "Исторические полигоны происходят из Seshat Cliopatria и распространяются по лицензии CC BY 4.0; ссылка и атрибуция сохранены в атласе. Базовая карта использует OpenFreeMap и данные с атрибуцией, указанной на карте. Тексты внешних исторических источников принадлежат их правообладателям; МҰРА даёт ссылки и собственные краткие пересказы.",
@@ -97,13 +101,17 @@ export const legal: Record<Locale, LegalCopy> = {
       intro: "Бұл бетте МҰРА-ның қазіргі нұсқасы қандай деректерді өңдейтіні түсіндіріледі. Жобаны Linux Team жүргізеді. Деректерге қатысты сұрақтарды төмендегі мекенжайға жіберуге болады.",
       sections: [
         { heading: "Сайт пен картаны қарау", paragraphs: [
-          "Беттер мен тарихи GeoJSON деректерін жүктеу үшін браузер МҰРА серверіне сұрау жібереді. Хостинг IP мекенжайы мен браузер туралы мәліметтерді қоса алғанда, сұраудың техникалық деректерін өңдеуі мүмкін. Қолданбада тіркелгі де, талдау скрипттері де жоқ.",
+          "Беттер мен тарихи GeoJSON деректерін жүктеу үшін браузер МҰРА серверіне сұрау жібереді. Хостинг IP мекенжайы мен браузер туралы мәліметтерді қоса алғанда, сұраудың техникалық деректерін өңдеуі мүмкін. Қолданбада серверлік тіркелгі де, талдау скрипттері де жоқ.",
           "Негізгі карта OpenFreeMap қызметінен тікелей жүктеледі. Осы кезде браузер карта жеткізушісіне желілік сұраудың әдеттегі деректерін жібереді. Картографиялық деректердің атрибуциясы картада көрсетілген.",
         ] },
         { heading: "Gemini тарихи гиді", paragraphs: [
           "Гидке сұрақ жіберсеңіз, МҰРА сервері Google Gemini қызметіне сұрақ мәтінін, таңдалған кезеңді, оқиғаны немесе тұлғаны, алдыңғы ең көбі төрт хабарды және таңдалған кезеңнің тексерілген қысқаша материалдары мен дереккөз атауларын жібереді. Gemini кілті серверде қалады.",
           "МҰРА әңгімені өз дерекқорында сақтамайды. Хабарлар ашық беттің жадында тұрады және бет жаңартылғанда немесе жабылғанда жоғалады. Сервер сұрақ мәтінін қолданба журналына әдейі жазбайды. Хостинг пен Google өздерінің техникалық журналдарын жүргізіп, деректерді өз шарттарына сай өңдеуі мүмкін.",
           "Google деректерді Gemini API қызметінің ақысыз және ақылы квоталарында әртүрлі өңдейді. Қоғамдық сайттың квота түрі өзгеруі мүмкін; МҰРА Google сұрауларды сақтамайды немесе қолданбайды деп уәде бермейді. Жеке, құпия не жасырын мәлімет жібермеңіз.",
+        ] },
+        { heading: "Демо-профиль", paragraphs: [
+          "Кіру мен тіркелу демо режимде жұмыс істейді: енгізілген кез келген дерек жарайды, құпиясөз тексерілмейді. Қолданба телефон немесе email және құпиясөз өрістерін серверге жібермейді әрі сақтамайды. Браузердің құпиясөзді өзі сақтауы оның баптауларына байланысты.",
+          "Атыңыз бен өзіңіз көрсеткен ру тек осы браузердің localStorage қоймасында mura-demo-profile-v1 кілтімен сақталады. Ру жеке текті растамайды. Шыққанда жергілікті демо-профиль өшіріледі; қорғалған тіркелгі де, құрылғылар арасында синхрондау да жоқ.",
         ] },
         { heading: "Тіл және оқу жетістігі", paragraphs: [
           "Таңдалған тіл localStorage ішінде және бір жылға дейін жарамды mura-locale cookie файлында сақталады. Cookie бетті бірден таңдалған тілде ашуға көмектеседі.",
@@ -132,7 +140,7 @@ export const legal: Record<Locale, LegalCopy> = {
           "Гидке жеке немесе құпия дерек жібермеңіз. Қызметті API-ді автоматты түрде шамадан тыс жүктеу не заңсыз әрекеттер үшін қолданбаңыз.",
         ] },
         { heading: "Карточкалар мен XP", paragraphs: [
-          "Тест пен карточкалар тіркелгісіз қолжетімді. XP тек осы браузерде аяқталған сабақтарды көрсетеді, ақшалай құны жоқ және сыйлық не рейтингтегі орын бермейді. Браузер деректерін тазалау жетістікті өшіреді.",
+          "Демо-кіруден кейін тест пен карточкалар қорғалған тіркелгісіз қолжетімді. XP тек осы браузерде аяқталған сабақтарды көрсетеді, демо-профильге байланбайды, ақшалай құны жоқ және сыйлық не рейтингтегі орын бермейді. Браузер деректерін тазалау жетістікті өшіреді.",
         ] },
         { heading: "Дереккөздер мен құқықтар", paragraphs: [
           "Тарихи полигондар Seshat Cliopatria жинағынан алынған және CC BY 4.0 лицензиясымен таратылады; сілтеме мен атрибуция атласта сақталған. Негізгі карта OpenFreeMap қызметін және картада атрибуциясы көрсетілген деректерді қолданады. Сыртқы тарихи мәтіндердің құқықтары өз иелерінде; МҰРА сілтемелер мен қысқаша өз сөзіндегі мазмұндамаларды береді.",
@@ -158,13 +166,17 @@ export const legal: Record<Locale, LegalCopy> = {
       intro: "This page describes how the current version of МҰРА handles data. Linux Team operates the project. Use the address below for questions about data handling.",
       sections: [
         { heading: "Site visits and map", paragraphs: [
-          "Your browser requests pages and historical GeoJSON from МҰРА's server. The hosting provider may process technical request data, including IP address and browser details. The app has no accounts or analytics scripts.",
+          "Your browser requests pages and historical GeoJSON from МҰРА's server. The hosting provider may process technical request data, including IP address and browser details. The app has no server-side accounts or analytics scripts.",
           "The basemap loads directly from OpenFreeMap. Your browser sends ordinary network request data to the map provider. Map data attribution appears on the map.",
         ] },
         { heading: "Gemini historical guide", paragraphs: [
           "When you ask the guide a question, МҰРА's server sends Google Gemini the question, selected era, event or figure, up to four previous messages, and verified short summaries for the selected era with source titles. The Gemini key stays on the server.",
           "МҰРА does not store chats in its own database. Messages remain in the open page's memory and disappear when you reload or close it. The server does not intentionally log question text in application logs. The hosting provider and Google may keep their own technical logs and process data under their terms.",
           "Google handles data differently under unpaid and paid Gemini API quotas. The public site's quota type may change; МҰРА does not promise that Google will neither retain nor use requests. Do not submit personal, confidential or secret information.",
+        ] },
+        { heading: "Demo profile", paragraphs: [
+          "Sign-in and registration are demos: any entered details work, and passwords are not checked. The app does not send phone or email and password fields to its server or store them. Your browser may offer to save passwords according to its own settings.",
+          "Your name and self-declared ru are stored only in this browser's localStorage under mura-demo-profile-v1. A stated ru does not verify ancestry. Signing out removes the local demo profile; there is no secure account or cross-device sync.",
         ] },
         { heading: "Language, theme and learning progress", paragraphs: [
           "Your selected language is stored in localStorage and in the mura-locale cookie for up to one year. The cookie helps open the page in the selected language immediately.",
@@ -193,7 +205,7 @@ export const legal: Record<Locale, LegalCopy> = {
           "Do not send personal, confidential or secret data to the guide. Do not use the service for automated API overload or unlawful activity.",
         ] },
         { heading: "Flashcards and XP", paragraphs: [
-          "Quiz and flashcards work without an account. XP reflects completed activities in this browser only, has no monetary value, and provides no prize or leaderboard position. Clearing browser data removes progress.",
+          "After demo entry, quiz and flashcards work without a secure account. XP reflects completed activities in this browser only, is not linked to the demo profile, has no monetary value, and provides no prize or leaderboard position. Clearing browser data removes progress.",
         ] },
         { heading: "Sources and rights", paragraphs: [
           "Historical polygons come from Seshat Cliopatria under CC BY 4.0; the atlas retains its link and attribution. The basemap uses OpenFreeMap and data credited on the map. External historical texts remain the property of their rights holders; МҰРА links to them and provides short original summaries.",

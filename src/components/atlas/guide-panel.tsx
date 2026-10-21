@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { guideSuggestions } from "@/data/guide";
 import { ui } from "@/data/ui-translations";
@@ -93,8 +94,6 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState, local
 
   useEffect(() => { if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight; }, [messages, pending]);
 
-  if (!open) return null;
-
   async function ask(question: string, previous?: PendingQuestion) {
     const cleaned = question.trim();
     if (!available || pending || cleaned.length < 3 || cleaned.length > MAX_QUESTION_LENGTH) return;
@@ -147,11 +146,12 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState, local
   }
 
   return <>
-    {isMobile && <button className="guide-backdrop" type="button" tabIndex={-1} aria-label={copy.guideCloseLabel} onClick={onClose} />}
-    <section ref={panelRef} className="guide-panel" role={isMobile ? "dialog" : "region"}
-      aria-modal={isMobile ? true : undefined} aria-labelledby="guide-title">
+    {isMobile && open && <button className="guide-backdrop" type="button" tabIndex={-1} aria-label={copy.guideCloseLabel} onClick={onClose} />}
+    <section ref={panelRef} className={`guide-panel${open ? " is-open" : ""}`} role="dialog" inert={!open}
+      aria-hidden={!open} aria-modal={isMobile ? true : undefined} aria-labelledby="guide-title">
       <div className="guide-top">
-        <div><span className="panel-overline">{copy.guideOverline}</span><h2 id="guide-title">{copy.guideTitle}</h2></div>
+        <div className="guide-identity"><Image src="/images/guide-avatar.png" alt="" width={54} height={54} sizes="54px" />
+          <div><span className="panel-overline">{copy.guideOverline}</span><h2 id="guide-title">{copy.guideTitle}</h2></div></div>
         <button type="button" className="guide-close" onClick={onClose} aria-label={copy.guideCloseLabel}>{copy.guideClose}</button>
       </div>
       <p className="guide-context">{eraText(era, "label", locale)}{event ? ` / ${eventText(event.properties, "name", locale)}` : figure ? ` / ${figureText(figure, "name", locale)}` : ""}</p>

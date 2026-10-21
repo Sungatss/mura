@@ -403,8 +403,6 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             lang={option} aria-label={option === "kk" ? "Қазақша" : option === "ru" ? "Русский" : "English"}
             aria-pressed={locale === option} onClick={() => setLocalePreference(option)}>{option.toUpperCase()}</button>)}
         </div>
-        <button type="button" className="guide-trigger" aria-expanded={guideOpen} aria-controls="guide-title"
-          onClick={() => { setLearningOpen(false); setShezhireOpen(false); setGuideOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M5 4h14v12H9l-4 4V4Z" /><path d="M9 8h6M9 12h4" /></svg>{copy.guideTrigger}</button>
         <button type="button" className="guide-trigger" aria-expanded={learningOpen} aria-controls="learn-title"
           onClick={() => { setGuideOpen(false); setShezhireOpen(false); setLearningOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M12 5C8 2 3 4 3 4v15s5-2 9 1c4-3 9-1 9-1V4s-5-2-9 1Zm0 0v15" /></svg>{copy.learnTrigger}</button>
         <button type="button" className="guide-trigger" aria-expanded={shezhireOpen} aria-controls="shezhire-title"
@@ -495,8 +493,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) resizePanel(event.clientX); }}
         onPointerUp={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); localStorage.setItem("mura-panel-width", String(panelWidth)); }}
         onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); const width = Math.max(280, Math.min(700, panelWidth + (event.key === "ArrowLeft" ? 24 : -24))); setPanelWidth(width); localStorage.setItem("mura-panel-width", String(width)); } }} />
-      <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen || shezhireOpen ? " is-guide-open" : ""}${shezhireOpen && mobile && !shezhireDetailOpen ? " shezhire-graph-only" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : shezhireOpen ? "shezhire-title" : "panel-title"}>
-        <div className="atlas-panel-content" hidden={guideOpen || learningOpen || shezhireOpen}>
+      <aside ref={panelRef} className={`atlas-panel${learningOpen || shezhireOpen ? " is-guide-open" : ""}${shezhireOpen && mobile && !shezhireDetailOpen ? " shezhire-graph-only" : ""}`} aria-labelledby={learningOpen ? "learn-title" : shezhireOpen ? "shezhire-title" : "panel-title"}>
+        <div className="atlas-panel-content" hidden={learningOpen || shezhireOpen}>
         <div className="panel-overline">{activePlace ? copy.placeLabel : compareOpen ? copy.compareMode : activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
         {activePlace ? <section className="place-detail" aria-labelledby="panel-title">
           <button className="back-link" type="button" onClick={() => setSelectedPlaceId(null)}>← {copy.backToPeriod}</button>
@@ -646,13 +644,18 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           </nav>
         </div>
         </div>
-        <GuidePanel key={`${selectedId}:${selectedEventId ?? ""}:${selectedFigureId ?? ""}:${locale}`}
-          open={guideOpen} onClose={closeGuide} era={selectedEra} event={activeEvent} figure={activeFigure} loadState={loadState} locale={locale} />
         <LearningPanel key={`${selectedId}:${selectedFigureId ?? ""}`} open={learningOpen} onClose={closeLearning}
           era={selectedEra} figure={activeFigure} locale={locale} />
         <ShezhirePanel open={shezhireOpen && (!mobile || shezhireDetailOpen)} onClose={closeShezhire} onExploreFigure={exploreShezhireFigure} locale={locale}
           selectedZhuzId={selectedZhuzId} selectedRuId={selectedRuId} onSelect={selectShezhire} />
       </aside>
     </div>
+    <GuidePanel key={`${selectedId}:${selectedEventId ?? ""}:${selectedFigureId ?? ""}:${locale}`}
+      open={guideOpen} onClose={closeGuide} era={selectedEra} event={activeEvent} figure={activeFigure} loadState={loadState} locale={locale} />
+    <button type="button" className="guide-launcher" aria-expanded={guideOpen} aria-controls="guide-title"
+      aria-label={copy.guideTrigger} onClick={() => { setLearningOpen(false); setShezhireOpen(false); setGuideOpen((current) => !current); }}>
+      <span className="guide-launcher-image"><Image src="/images/guide-avatar.png" alt="" width={80} height={80} sizes="80px" priority /></span>
+      <span className="guide-launcher-label">{copy.guideTrigger}</span>
+    </button>
   </main>;
 }

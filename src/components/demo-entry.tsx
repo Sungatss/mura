@@ -9,6 +9,7 @@ import { accessCopy } from "@/data/demo-access-translations";
 import { legal } from "@/data/legal";
 import { useDemoProfile, saveDemoProfile } from "@/lib/demo-profile";
 import { locales, type Locale } from "@/lib/i18n";
+import { brandName } from "@/lib/i18n/brand";
 import { setLocalePreference, useLocale } from "@/lib/i18n/store";
 
 export function MuraEntry({ initialLocale }: { initialLocale: Locale }) {
@@ -19,7 +20,7 @@ export function MuraEntry({ initialLocale }: { initialLocale: Locale }) {
 
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
 
-  if (profile === undefined) return <main className="access-loading" aria-label={copy.title}><BrandMark /><strong>МҰРА</strong></main>;
+  if (profile === undefined) return <main className="access-loading" aria-label={copy.title}><BrandMark /><strong>{brandName(locale)}</strong></main>;
   if (profile) return <AtlasShell initialLocale={initialLocale} />;
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -32,7 +33,7 @@ export function MuraEntry({ initialLocale }: { initialLocale: Locale }) {
 
   return <main className="access-layout">
     <section className="access-hero" aria-labelledby="access-hero-title">
-      <div className="access-hero-top"><BrandMark /><span>МҰРА <small>{copy.subtitle}</small></span></div>
+      <div className="access-hero-top"><BrandMark /><span>{brandName(locale)} <small>{copy.subtitle}</small></span></div>
       <svg className="access-hero-art" viewBox="0 0 560 560" fill="none" aria-hidden="true">
         <circle cx="280" cy="280" r="204" stroke="currentColor" strokeWidth="1" strokeDasharray="3 9" />
         <circle cx="280" cy="280" r="157" stroke="currentColor" strokeWidth="1" />
@@ -45,12 +46,12 @@ export function MuraEntry({ initialLocale }: { initialLocale: Locale }) {
         <p>{copy.heroBody}</p><span className="access-hero-foot">{copy.heroFoot}</span></div>
     </section>
     <section className="access-side" aria-labelledby="access-form-title">
-      <header className="access-side-header"><div className="access-side-brand"><BrandMark /><strong>МҰРА</strong></div>
+      <header className="access-side-header"><div className="access-side-brand"><BrandMark /><strong>{brandName(locale)}</strong></div>
         <div className="access-preferences"><ThemeToggle locale={locale} /><div className="locale-switch" role="group" aria-label={legal[locale].languageLabel}>
           {locales.map((option) => <button key={option} type="button" lang={option} aria-pressed={locale === option} onClick={() => setLocalePreference(option)}>{option.toUpperCase()}</button>)}
         </div></div></header>
       <div className="access-form-wrap">
-        <div className="access-heading"><span className="access-overline">МҰРА / {copy.subtitle}</span><h2 id="access-form-title">{mode === "signin" ? copy.welcome : copy.registerTitle}</h2><p>{copy.intro}</p></div>
+        <div className="access-heading"><span className="access-overline">{brandName(locale)} / {copy.subtitle}</span><h2 id="access-form-title">{mode === "signin" ? copy.welcome : copy.registerTitle}</h2><p>{copy.intro}</p></div>
         <div className="access-tabs" role="group" aria-label={copy.title}>
           <button type="button" aria-pressed={mode === "signin"} onClick={() => setMode("signin")}>{copy.signIn}</button>
           <button type="button" aria-pressed={mode === "register"} onClick={() => setMode("register")}>{copy.register}</button>

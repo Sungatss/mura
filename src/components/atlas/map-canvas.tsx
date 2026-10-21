@@ -5,6 +5,7 @@ import { useTheme } from "@/components/theme-provider";
 import { eventCategory, type EventCategory } from "@/data/event-categories";
 import { eventText } from "@/data/historical-translations";
 import { ui } from "@/data/ui-translations";
+import { historicalPlaces } from "@/data/historical-places";
 import type { EraDataset, EventFeature, PointGeometry } from "@/lib/atlas/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -32,30 +33,34 @@ type MapCanvasProps = {
   locale: Locale;
   categoryFilter: EventCategory | "all";
   selectedEventId: string | null;
+  selectedPlaceId: string | null;
   compareEnabled: boolean;
   compareData: EraDataset | null;
   compareEraId: string;
   compareBalance: number;
   onSelectEvent?: (id: string) => void;
+  onSelectPlace?: (id: string) => void;
 };
 
-export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId, compareEnabled, compareData, compareEraId, compareBalance, onSelectEvent }: MapCanvasProps) {
+export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId, selectedPlaceId, compareEnabled, compareData, compareEraId, compareBalance, onSelectEvent, onSelectPlace }: MapCanvasProps) {
   const { theme } = useTheme();
   const themeRef = useRef(theme);
   const lastFitData = useRef<EraDataset | null>(null);
   const lastFitCompareData = useRef<EraDataset | null>(null);
   const lastFitCompareEnabled = useRef(false);
-  const lastFitSize = useRef("");
   const lastAppliedSource = useRef<import("maplibre-gl").GeoJSONSource | null>(null);
   const lastAppliedData = useRef<EraDataset | null>(null);
   const lastAppliedCompareSource = useRef<import("maplibre-gl").GeoJSONSource | null>(null);
   const lastAppliedCompareData = useRef<EraDataset | null>(null);
   const markersRef = useRef(new Map<string, import("maplibre-gl").Marker>());
+  const placeMarkersRef = useRef(new Map<string, import("maplibre-gl").Marker>());
+  const clusterMarkersRef = useRef<import("maplibre-gl").Marker[]>([]);
   const maplibreRef = useRef<typeof import("maplibre-gl") | null>(null);
   const [mapRevision, setMapRevision] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<import("maplibre-gl").Map | null>(null);
   const onSelectEventRef = useRef(onSelectEvent);
+  const onSelectPlaceRef = useRef(onSelectPlace);
   const [mapState, setMapState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
@@ -68,6 +73,19 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
   }, [theme]);
 
   useEffect(() => { onSelectEventRef.current = onSelectEvent; }, [onSelectEvent]);
+  useEffect(() => { onSelectPlaceRef.current = onSelectPlace; }, [onSelectPlace]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => mapRef.current?.resize());
+    });
+    observer.observe(container);
+    return () => { observer.disconnect(); cancelAnimationFrame(frame); };
+  }, []);
 
   useEffect(() => {
     function localizeControls() {
@@ -103,6 +121,8 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
     let map: import("maplibre-gl").Map | undefined;
     let cancelled = false;
     const markers = markersRef.current;
+    const placeMarkers = placeMarkersRef.current;
+    const clusterMarkers = clusterMarkersRef.current;
 
     async function initializeMap() {
       try {
@@ -180,6 +200,10 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
       cancelled = true;
       for (const marker of markers.values()) marker.remove();
       markers.clear();
+      for (const marker of placeMarkers.values()) marker.remove();
+      placeMarkers.clear();
+      for (const marker of clusterMarkers) marker.remove();
+      clusterMarkers.length = 0;
       mapRef.current = null;
       maplibreRef.current = null;
       map?.remove();
@@ -190,7 +214,6 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
     const map = mapRef.current;
     if (mapState !== "ready" || !map?.getSource("atlas-territories")) return;
     const loadedTheme = themeRef.current;
-    const viewportSize = `${containerRef.current?.clientWidth}:${containerRef.current?.clientHeight}`;
     const territories = map.getSource("atlas-territories") as import("maplibre-gl").GeoJSONSource;
     const compareTerritories = map.getSource("atlas-compare-territories") as import("maplibre-gl").GeoJSONSource | undefined;
     if (territories !== lastAppliedSource.current || data !== lastAppliedData.current) {
@@ -228,8 +251,8 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
     }
     if (data && (!compareEnabled || compareData) && !selectedEventId
       && (data !== lastFitData.current || (compareEnabled ? compareData : null) !== lastFitCompareData.current
-        || compareEnabled !== lastFitCompareEnabled.current || viewportSize !== lastFitSize.current)
-      && (data.territories.features.length || data.events.features.some((feature) => locatedEvent(feature, eraId)))) {
+        || compareEnabled !== lastFitCompareEnabled.current)
+      && (data.territories.features.length || data.events.features.some((feature) => locatedEvent(feature, eraId)) || historicalPlaces.some((place) => place.eraId === eraId))) {
       const bounds = { west: 180, south: 90, east: -180, north: -90 };
       for (const feature of [...data.territories.features, ...(compareEnabled ? compareData?.territories.features ?? [] : [])]) {
         const polygons = feature.geometry.type === "Polygon"
@@ -254,10 +277,16 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
           bounds.north = Math.max(bounds.north, lat);
         }
       }
+      for (const place of compareEnabled ? [] : historicalPlaces.filter((item) => item.eraId === eraId)) {
+        const [lng, lat] = place.coordinates;
+        bounds.west = Math.min(bounds.west, lng);
+        bounds.south = Math.min(bounds.south, lat);
+        bounds.east = Math.max(bounds.east, lng);
+        bounds.north = Math.max(bounds.north, lat);
+      }
       lastFitData.current = data;
       lastFitCompareData.current = compareEnabled ? compareData : null;
       lastFitCompareEnabled.current = compareEnabled;
-      lastFitSize.current = viewportSize;
       map.fitBounds(
         [[bounds.west, bounds.south], [bounds.east, bounds.north]],
         {
@@ -329,10 +358,90 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
   }, [data, eraId, locale, categoryFilter, mapState, compareEnabled]);
 
   useEffect(() => {
+    const map = mapRef.current;
+    const maplibregl = maplibreRef.current;
+    if (mapState !== "ready" || !map || !maplibregl) return;
+    const markers = placeMarkersRef.current;
+    for (const marker of markers.values()) marker.remove();
+    markers.clear();
+    if (compareEnabled) return;
+    const copy = ui[locale];
+    for (const place of historicalPlaces.filter((item) => item.eraId === eraId)) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "map-place-marker";
+      button.setAttribute("aria-label", `${copy.placeLabel}: ${place.name[locale]}`);
+      button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s7-6.3 7-12a7 7 0 0 0-14 0c0 5.7 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>';
+      const preview = document.createElement("span");
+      preview.className = "map-marker-preview";
+      const title = document.createElement("strong");
+      title.textContent = place.name[locale];
+      const note = document.createElement("span");
+      note.textContent = place.locationNote[locale];
+      preview.append(title, note);
+      button.appendChild(preview);
+      button.addEventListener("click", () => onSelectPlaceRef.current?.(place.id));
+      markers.set(place.id, new maplibregl.Marker({ element: button, anchor: "bottom" }).setLngLat(place.coordinates).addTo(map));
+    }
+    return () => { for (const marker of markers.values()) marker.remove(); markers.clear(); };
+  }, [eraId, locale, mapState, compareEnabled]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const maplibregl = maplibreRef.current;
+    if (mapState !== "ready" || !map || !maplibregl || compareEnabled) return;
+    const clusters = clusterMarkersRef.current;
+    const eventMarkers = markersRef.current;
+    const placeMarkers = placeMarkersRef.current;
+    function updateClusters() {
+      if (!map || !maplibregl) return;
+      for (const marker of clusters) marker.remove();
+      clusters.length = 0;
+      const entries = [...eventMarkers.values(), ...placeMarkers.values()];
+      for (const marker of entries) marker.getElement().style.display = "";
+      if (map.getZoom() >= 5.2 || entries.length < 2) return;
+      const groups: typeof entries[] = [];
+      for (const marker of entries) {
+        const point = map.project(marker.getLngLat());
+        const group = groups.find((items) => {
+          const center = map.project(items[0].getLngLat());
+          return Math.hypot(point.x - center.x, point.y - center.y) < 54;
+        });
+        if (group) group.push(marker);
+        else groups.push([marker]);
+      }
+      for (const group of groups.filter((items) => items.length > 1)) {
+        for (const marker of group) marker.getElement().style.display = "none";
+        const [lng, lat] = group.reduce(([x, y], marker) => [x + marker.getLngLat().lng, y + marker.getLngLat().lat], [0, 0]);
+        const center: [number, number] = [lng / group.length, lat / group.length];
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "map-location-cluster";
+        button.setAttribute("aria-label", `${ui[locale].mapCluster}: ${group.length}`);
+        button.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg><span>${group.length}</span>`;
+        button.addEventListener("click", () => map.easeTo({ center, zoom: Math.min(map.getZoom() + 2, 8), duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 500 }));
+        clusters.push(new maplibregl.Marker({ element: button, anchor: "center" }).setLngLat(center).addTo(map));
+      }
+    }
+    updateClusters();
+    map.on("zoomend", updateClusters);
+    return () => {
+      map.off("zoomend", updateClusters);
+      for (const marker of clusters) marker.remove();
+      clusters.length = 0;
+      for (const marker of [...eventMarkers.values(), ...placeMarkers.values()]) marker.getElement().style.display = "";
+    };
+  }, [data, eraId, locale, categoryFilter, mapState, compareEnabled, mapRevision]);
+
+  useEffect(() => {
     for (const [id, marker] of markersRef.current) {
       marker.getElement().classList.toggle("is-selected", id === selectedEventId);
     }
   }, [selectedEventId, mapRevision, data, categoryFilter, locale]);
+
+  useEffect(() => {
+    for (const [id, marker] of placeMarkersRef.current) marker.getElement().classList.toggle("is-selected", id === selectedPlaceId);
+  }, [selectedPlaceId, eraId, locale]);
 
   useEffect(() => {
     if (!selectedEventId || !data || mapState !== "ready" || compareEnabled) return;
@@ -347,6 +456,14 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
       essential: false,
     });
   }, [selectedEventId, data, eraId, mapState, compareEnabled]);
+
+  useEffect(() => {
+    if (!selectedPlaceId || mapState !== "ready" || compareEnabled) return;
+    const place = historicalPlaces.find((item) => item.id === selectedPlaceId);
+    const map = mapRef.current;
+    if (!place || !map) return;
+    map.flyTo({ center: place.coordinates, zoom: Math.max(map.getZoom(), 6.2), duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 850, essential: false });
+  }, [selectedPlaceId, mapState, compareEnabled]);
 
   return (
     <div className="map-frame">

@@ -8,7 +8,8 @@ import { ui } from "@/data/ui-translations";
 import { figureText } from "@/data/historical-translations";
 import type { Locale } from "@/lib/i18n";
 
-type Props = { open: boolean; onClose: () => void; onExploreFigure: (id: string) => void; locale: Locale };
+type Props = { open: boolean; onClose: () => void; onExploreFigure: (id: string) => void; locale: Locale;
+  selectedZhuzId: string | null; selectedRuId: string | null; onSelect: (zhuzId: string | null, ruId: string | null) => void };
 
 function SourceLinks({ ids, locale }: { ids: string[]; locale: Locale }) {
   return <div className="shezhire-sources"><span>{ui[locale].sources}</span>{ids.map((id) => {
@@ -32,9 +33,7 @@ function ZhuzCard({ zhuz, locale, onClick }: { zhuz: ShezhireZhuz; locale: Local
   </button>;
 }
 
-export function ShezhirePanel({ open, onClose, onExploreFigure, locale }: Props) {
-  const [selectedZhuzId, setSelectedZhuzId] = useState<string | null>(null);
-  const [selectedRuId, setSelectedRuId] = useState<string | null>(null);
+export function ShezhirePanel({ open, onClose, onExploreFigure, locale, selectedZhuzId, selectedRuId, onSelect }: Props) {
   const [search, setSearch] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const panelRef = useRef<HTMLElement>(null);
@@ -85,8 +84,8 @@ export function ShezhirePanel({ open, onClose, onExploreFigure, locale }: Props)
 
   if (!open) return null;
 
-  function selectZhuz(id: string) { setSelectedZhuzId(id); setSelectedRuId(null); setSearch(""); }
-  function selectRu(parentId: string, id: string) { setSelectedZhuzId(parentId); setSelectedRuId(id); setSearch(""); }
+  function selectZhuz(id: string) { onSelect(id, null); setSearch(""); }
+  function selectRu(parentId: string, id: string) { onSelect(parentId, id); setSearch(""); }
 
   return <>
     {isMobile && <button className="guide-backdrop" type="button" tabIndex={-1} aria-label={copy.shezhireCloseLabel} onClick={onClose} />}
@@ -104,16 +103,16 @@ export function ShezhirePanel({ open, onClose, onExploreFigure, locale }: Props)
             <span>{result.zhuz.name[locale]}</span><strong>{result.ru?.name[locale] ?? result.zhuz.name[locale]}</strong><span aria-hidden="true">↗</span>
           </button>)}</div> : <p className="empty-copy">{copy.shezhireNoResults}</p>}
         </section> : ru && zhuz ? <section key={ru.id} className="shezhire-view" aria-live="polite">
-          <nav className="shezhire-breadcrumb" aria-label={copy.shezhireTitle}><button type="button" onClick={() => { setSelectedZhuzId(null); setSelectedRuId(null); }}>{copy.shezhireZhuzes}</button><span>/</span>
-            <button type="button" onClick={() => setSelectedRuId(null)}>{zhuz.name[locale]}</button><span>/</span><strong>{ru.name[locale]}</strong></nav>
+          <nav className="shezhire-breadcrumb" aria-label={copy.shezhireTitle}><button type="button" onClick={() => onSelect(null, null)}>{copy.shezhireZhuzes}</button><span>/</span>
+            <button type="button" onClick={() => onSelect(zhuz.id, null)}>{zhuz.name[locale]}</button><span>/</span><strong>{ru.name[locale]}</strong></nav>
           <span className="shezhire-kicker">{copy.shezhireOverview}</span><h3>{ru.name[locale]}</h3>
           {ru.association && <p className="shezhire-association">{copy.shezhireAssociation}: <strong>{ru.association[locale]}</strong> · {zhuz.name[locale]}</p>}
           <p>{ru.overview?.[locale] ?? copy.shezhireMissing}</p>
           <SourceLinks ids={ru.sourceIds} locale={locale} />
           <p className="shezhire-detail-note">{copy.shezhireCollective}</p>
-          <button type="button" className="shezhire-back" onClick={() => setSelectedRuId(null)}>← {copy.shezhireBack}</button>
+          <button type="button" className="shezhire-back" onClick={() => onSelect(zhuz.id, null)}>← {copy.shezhireBack}</button>
         </section> : zhuz ? <section key={zhuz.id} className="shezhire-view" aria-live="polite">
-          <nav className="shezhire-breadcrumb" aria-label={copy.shezhireTitle}><button type="button" onClick={() => setSelectedZhuzId(null)}>{copy.shezhireZhuzes}</button><span>/</span><strong>{zhuz.name[locale]}</strong></nav>
+          <nav className="shezhire-breadcrumb" aria-label={copy.shezhireTitle}><button type="button" onClick={() => onSelect(null, null)}>{copy.shezhireZhuzes}</button><span>/</span><strong>{zhuz.name[locale]}</strong></nav>
           <span className="shezhire-kicker">{copy.shezhireOverview}</span><h3>{zhuz.name[locale]}</h3><p>{zhuz.overview[locale]}</p>
           <SourceLinks ids={zhuz.sourceIds} locale={locale} />
           {zhuz.contextualFigureId && (() => {

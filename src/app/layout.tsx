@@ -3,12 +3,14 @@ import { cookies } from "next/headers";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ui } from "@/data/ui-translations";
 import { requestLocale } from "@/lib/i18n/server";
+import { brandName } from "@/lib/i18n/brand";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const copy = ui[await requestLocale()];
-  return { title: `МҰРА | ${copy.brandSubtitle}`, description: copy.atlasIntro };
+  const locale = await requestLocale();
+  const copy = ui[locale];
+  return { title: `${brandName(locale)} | ${copy.brandSubtitle}`, description: copy.atlasIntro };
 }
 
 export default async function RootLayout({

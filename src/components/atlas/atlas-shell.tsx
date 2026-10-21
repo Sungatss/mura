@@ -10,6 +10,7 @@ import { GuidePanel } from "./guide-panel";
 import { LearningPanel } from "./learning-panel";
 import { MapCanvas } from "./map-canvas";
 import { ShezhirePanel } from "./shezhire-panel";
+import { ShezhireTree } from "./shezhire-tree";
 import { eras, sources } from "@/data/atlas";
 import { eventCategory, type EventCategory } from "@/data/event-categories";
 import { figures } from "@/data/figures";
@@ -17,12 +18,14 @@ import { figureArtwork } from "@/data/figure-artwork";
 import { eraHistoryImages, eventHistoryImages, figureHistoryImages } from "@/data/history-images";
 import { figureSignificance } from "@/data/figure-profiles";
 import { ui } from "@/data/ui-translations";
+import { historicalPlaces } from "@/data/historical-places";
 import { legal } from "@/data/legal";
 import { eraText, eventText, figureText, sourceNote, sourceTitle, territoryText } from "@/data/historical-translations";
 import type { Era, EraDataset, EventFeature, HistoricalFigure } from "@/lib/atlas/types";
 import { validateEraData } from "@/lib/atlas/validate";
 import { formatAccessDate, formatCount, type Locale } from "@/lib/i18n";
 import { setLocalePreference, useLocale } from "@/lib/i18n/store";
+import { brandName } from "@/lib/i18n/brand";
 
 type LoadState = "loading" | "ready" | "empty" | "error";
 
@@ -114,6 +117,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const locale = useLocale(initialLocale);
   const [selectedId, setSelectedId] = useState(eras[0].id);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [closingEventId, setClosingEventId] = useState<string | null>(null);
   const [selectedFigureId, setSelectedFigureId] = useState<string | null>(null);
   const [closingFigureId, setClosingFigureId] = useState<string | null>(null);
@@ -130,10 +134,20 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const [guideOpen, setGuideOpen] = useState(false);
   const [learningOpen, setLearningOpen] = useState(false);
   const [shezhireOpen, setShezhireOpen] = useState(false);
+  const [selectedZhuzId, setSelectedZhuzId] = useState<string | null>(null);
+  const [selectedRuId, setSelectedRuId] = useState<string | null>(null);
+  const [mobile, setMobile] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<"split" | "map" | "panel">("split");
+  const [panelWidth, setPanelWidth] = useState(360);
+  const workspaceRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const closeGuide = useCallback(() => setGuideOpen(false), []);
   const closeLearning = useCallback(() => setLearningOpen(false), []);
-  const closeShezhire = useCallback(() => setShezhireOpen(false), []);
+  const closeShezhire = useCallback(() => {
+    if (window.matchMedia("(max-width: 960px)").matches && (selectedZhuzId || selectedRuId)) {
+      setSelectedZhuzId(null); setSelectedRuId(null);
+    } else setShezhireOpen(false);
+  }, [selectedZhuzId, selectedRuId]);
   const copy = ui[locale];
   const selectedEra = eras.find((era) => era.id === selectedId) ?? eras[0];
   const compareEra = eras.find((era) => era.id === compareId) ?? eras[1];
@@ -152,6 +166,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     && (selectedEra.kind === "technical-fixture" || !!feature.properties.coordinateSourceIds?.length)
     && (categoryFilter === "all" || eventCategory(feature.properties.id) === categoryFilter)).length;
   const activeEvent = events.find((feature) => feature.properties.id === selectedEventId);
+  const activePlace = historicalPlaces.find((place) => place.id === selectedPlaceId);
   const eraFigures = figures.filter((figure) => figure.eraIds.includes(selectedId));
   const activeFigure = eraFigures.find((figure) => figure.id === selectedFigureId);
   const activeFigureVisual = activeFigure ? figureArtwork[activeFigure.id] ?? figureHistoryImages[activeFigure.id] : undefined;
@@ -164,9 +179,40 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    document.title = `МҰРА | ${copy.brandSubtitle}`;
+    document.title = `${brandName(locale)} | ${copy.brandSubtitle}`;
     document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute("content", copy.atlasIntro);
   }, [locale, copy]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 960px)");
+    const update = () => setMobile(media.matches);
+    update();
+    media.addEventListener("change", update);
+    const frame = requestAnimationFrame(() => {
+      const storedWidth = Number(localStorage.getItem("mura-panel-width"));
+      const storedMode = localStorage.getItem("mura-layout-mode");
+      if (Number.isFinite(storedWidth) && storedWidth >= 280 && storedWidth <= 700) setPanelWidth(storedWidth);
+      if (storedMode === "map" || storedMode === "panel") setLayoutMode(storedMode);
+    });
+    return () => { media.removeEventListener("change", update); cancelAnimationFrame(frame); };
+  }, []);
+
+  function changeLayout(mode: "split" | "map" | "panel") {
+    setLayoutMode(mode);
+    localStorage.setItem("mura-layout-mode", mode);
+  }
+
+  function resizePanel(clientX: number) {
+    const rect = workspaceRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const width = Math.max(280, Math.min(Math.min(700, rect.width * 0.58), rect.right - clientX - 18));
+    setPanelWidth(Math.round(width));
+  }
+
+  function selectShezhire(zhuzId: string | null, ruId: string | null) {
+    setSelectedZhuzId(zhuzId);
+    setSelectedRuId(ruId);
+  }
 
   function selectEra(id: string) {
     if (id === selectedId) return;
@@ -176,6 +222,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     }
     if (id === "technical-fixture") setCompareOpen(false);
     setSelectedEventId(null);
+    setSelectedPlaceId(null);
     setClosingEventId(null);
     setSelectedFigureId(null);
     setClosingFigureId(null);
@@ -209,6 +256,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
     setClosingFigureId(null);
     setClosingEventId(null);
     setSelectedEventId(id);
+    setSelectedPlaceId(null);
     if (fromMap && window.matchMedia("(max-width: 960px)").matches) {
       requestAnimationFrame(() => panelRef.current?.scrollIntoView({
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
@@ -220,6 +268,15 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   function closeEvent() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setSelectedEventId(null);
     else setClosingEventId(selectedEventId);
+  }
+
+  function openPlace(id: string) {
+    setSelectedPlaceId(id);
+    setSelectedEventId(null);
+    setSelectedFigureId(null);
+    setGuideOpen(false);
+    setLearningOpen(false);
+    if (mobile) requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }));
   }
 
   function openFigure(id: string) {
@@ -314,9 +371,9 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
 
   return <main className="atlas-shell">
     <header className="atlas-header">
-      <div className="brand-lockup" aria-label={`МҰРА, ${copy.brandSubtitle}`}>
+      <div className="brand-lockup" aria-label={`${brandName(locale)}, ${copy.brandSubtitle}`}>
         <BrandMark />
-        <div className="brand-text"><strong>МҰРА</strong><span>{copy.brandSubtitle}</span></div>
+        <div className="brand-text"><strong>{brandName(locale)}</strong><span>{copy.brandSubtitle}</span></div>
       </div>
       <div className="header-actions">
         <span className="header-status"><span aria-hidden="true" />{copy.headerStatus}</span>
@@ -331,11 +388,16 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         <button type="button" className="guide-trigger" aria-expanded={learningOpen} aria-controls="learn-title"
           onClick={() => { setGuideOpen(false); setShezhireOpen(false); setLearningOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M12 5C8 2 3 4 3 4v15s5-2 9 1c4-3 9-1 9-1V4s-5-2-9 1Zm0 0v15" /></svg>{copy.learnTrigger}</button>
         <button type="button" className="guide-trigger" aria-expanded={shezhireOpen} aria-controls="shezhire-title"
-          onClick={() => { setGuideOpen(false); setLearningOpen(false); setShezhireOpen((current) => !current); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="5" r="2" /><circle cx="5" cy="18" r="2" /><circle cx="19" cy="18" r="2" /><path d="M12 7v5M5 16v-4h14v4" /></svg>{copy.shezhireTrigger}</button>
+          onClick={() => { setGuideOpen(false); setLearningOpen(false); setShezhireOpen((current) => !current); changeLayout("split"); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="5" r="2" /><circle cx="5" cy="18" r="2" /><circle cx="19" cy="18" r="2" /><path d="M12 7v5M5 16v-4h14v4" /></svg>{copy.shezhireTrigger}</button>
+        <div className="layout-controls" role="group" aria-label={copy.layoutResize}>
+          <button type="button" title={copy.layoutMap} aria-label={copy.layoutMap} aria-pressed={layoutMode === "map"} onClick={() => changeLayout("map")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M17 4v16"/></svg></button>
+          <button type="button" title={copy.layoutSplit} aria-label={copy.layoutSplit} aria-pressed={layoutMode === "split"} onClick={() => changeLayout("split")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M14 4v16"/></svg></button>
+          <button type="button" title={copy.layoutPanel} aria-label={copy.layoutPanel} aria-pressed={layoutMode === "panel"} onClick={() => changeLayout("panel")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16"/></svg></button>
+        </div>
         <DemoProfileMenu locale={locale} />
       </div>
     </header>
-    <div className="atlas-workspace">
+    <div ref={workspaceRef} className={`atlas-workspace layout-${layoutMode}${shezhireOpen ? " is-shezhire" : ""}`} style={{ "--atlas-panel-width": `${panelWidth}px` } as React.CSSProperties}>
       <nav className="timeline-region" aria-label={copy.timelineLabel}>
         <div className="section-heading"><h2>{copy.periods}</h2><span>{formatCount(locale, historicalEras.length, copy.cuts.split("|") as [string, string, string])}</span></div>
         <div className="timeline" role="group" aria-label={copy.timelineGroup}>
@@ -366,10 +428,11 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           {copy.fixtureControl} <span aria-hidden="true">↗</span>
         </button>}
       </nav>
-      <section className="map-region" aria-label={copy.mapLabel}>
+      <section className="map-region" aria-label={shezhireOpen ? copy.shezhireTitle : copy.mapLabel}>
+        <div className={`map-mode-content${shezhireOpen ? " is-hidden" : ""}`} aria-hidden={shezhireOpen} inert={shezhireOpen}>
         <MapCanvas data={data} eraId={selectedId} locale={locale} categoryFilter={categoryFilter}
           compareEnabled={compareOpen} compareData={compareData} compareEraId={compareId} compareBalance={compareBalance}
-          selectedEventId={selectedEventId} onSelectEvent={(id) => openEvent(id, true)} />
+          selectedEventId={selectedEventId} selectedPlaceId={selectedPlaceId} onSelectEvent={(id) => openEvent(id, true)} onSelectPlace={openPlace} />
         <div className="map-caption"><span className="caption-rule" aria-hidden="true" />{copy.mapCaption}</div>
         {selectedEra.kind === "historical-reconstruction" && !compareOpen && <div className="map-tools">
           <label htmlFor="map-category-filter">{copy.mapFilterLabel}</label>
@@ -379,7 +442,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             {categories.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}
           </select>
         </div>}
-        {loadState === "ready" && !compareOpen && selectedEra.kind === "historical-reconstruction" && locatedCount === 0
+        {loadState === "ready" && !compareOpen && selectedEra.kind === "historical-reconstruction" && locatedCount === 0 && !historicalPlaces.some((place) => place.eraId === selectedId)
           && <div className="map-empty" role="status">{copy.mapNoLocatedEvents}</div>}
         {selectedEra.kind === "historical-reconstruction" && <div className={`map-legend${compareOpen ? " is-comparing" : ""}`}>
           {compareOpen ? <>{selectedHasTerritory && <span className="compare-legend-item"><i className="compare-swatch" aria-hidden="true" />{eraText(selectedEra, "label", locale)}</span>}
@@ -388,12 +451,27 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             : <>{selectedHasTerritory ? <><span className="legend-line" aria-hidden="true" />{copy.approxReconstruction}</> : copy.noTerritories}
               {events.some((feature) => feature.geometry) && <span className="legend-marker">{copy.approxMarker}</span>}</>}
         </div>}
+        {historicalPlaces.some((place) => place.eraId === selectedId) && !compareOpen && <div className="place-legend"><span className="place-legend-diamond" aria-hidden="true" />{copy.placeLabel}</div>}
         {selectedEra.kind === "technical-fixture" && <div className="map-fixture-label">{copy.fixtureMapLabel}</div>}
+        </div>
+        {shezhireOpen && <ShezhireTree locale={locale} selectedZhuzId={selectedZhuzId} selectedRuId={selectedRuId} onSelect={selectShezhire} />}
       </section>
-      <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen || shezhireOpen ? " is-guide-open" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : shezhireOpen ? "shezhire-title" : "panel-title"}>
+      <div className="workspace-divider" role="separator" aria-orientation="vertical" aria-label={copy.layoutResize} tabIndex={layoutMode === "split" ? 0 : -1}
+        onPointerDown={(event) => { if (layoutMode !== "split") return; event.currentTarget.setPointerCapture(event.pointerId); }}
+        onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) resizePanel(event.clientX); }}
+        onPointerUp={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); localStorage.setItem("mura-panel-width", String(panelWidth)); }}
+        onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); const width = Math.max(280, Math.min(700, panelWidth + (event.key === "ArrowLeft" ? 24 : -24))); setPanelWidth(width); localStorage.setItem("mura-panel-width", String(width)); } }} />
+      <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen || shezhireOpen ? " is-guide-open" : ""}${shezhireOpen && mobile && !selectedZhuzId ? " shezhire-graph-only" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : shezhireOpen ? "shezhire-title" : "panel-title"}>
         <div className="atlas-panel-content" hidden={guideOpen || learningOpen || shezhireOpen}>
-        <div className="panel-overline">{compareOpen ? copy.compareMode : activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
-        {compareOpen ? <section className="compare-panel" aria-labelledby="panel-title">
+        <div className="panel-overline">{activePlace ? copy.placeLabel : compareOpen ? copy.compareMode : activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
+        {activePlace ? <section className="place-detail" aria-labelledby="panel-title">
+          <button className="back-link" type="button" onClick={() => setSelectedPlaceId(null)}>← {copy.backToPeriod}</button>
+          <span className="place-detail-icon" aria-hidden="true">◇</span><h1 id="panel-title">{activePlace.name[locale]}</h1>
+          <p className="detail-copy">{activePlace.description[locale]}</p>
+          <p className="certainty-note">{activePlace.locationNote[locale]}</p>
+          <a href={activePlace.sourceUrl} target="_blank" rel="noopener noreferrer" className="place-source">{copy.placeSource} ↗</a>
+          <button type="button" className="place-related" onClick={() => openEvent(activePlace.eventId)}>{copy.placeRelatedEvent}: {(() => { const linked = events.find((feature) => feature.properties.id === activePlace.eventId); return linked ? eventText(linked.properties, "name", locale) : activePlace.name[locale]; })()} ↗</button>
+        </section> : compareOpen ? <section className="compare-panel" aria-labelledby="panel-title">
           <h1 id="panel-title">{copy.compareTitle}</h1><p className="panel-intro">{copy.compareIntro}</p>
           <p className="certainty-note">{selectedHasTerritory || compareHasTerritory ? copy.boundaryApprox : copy.noTerritories}</p>
           <CompareEraSummary era={selectedEra} data={data} status={loadState} locale={locale} tone="first" onExplore={() => setCompareOpen(false)} />
@@ -537,7 +615,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           open={guideOpen} onClose={closeGuide} era={selectedEra} event={activeEvent} figure={activeFigure} loadState={loadState} locale={locale} />
         <LearningPanel key={`${selectedId}:${selectedFigureId ?? ""}`} open={learningOpen} onClose={closeLearning}
           era={selectedEra} figure={activeFigure} locale={locale} />
-        <ShezhirePanel open={shezhireOpen} onClose={closeShezhire} onExploreFigure={exploreShezhireFigure} locale={locale} />
+        <ShezhirePanel open={shezhireOpen && (!mobile || !!selectedZhuzId)} onClose={closeShezhire} onExploreFigure={exploreShezhireFigure} locale={locale}
+          selectedZhuzId={selectedZhuzId} selectedRuId={selectedRuId} onSelect={selectShezhire} />
       </aside>
     </div>
   </main>;

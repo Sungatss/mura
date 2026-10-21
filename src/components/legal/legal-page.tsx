@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/theme-provider";
 import { useEffect } from "react";
 import { legal, legalContact, legalOperator, legalUpdatedOn, providerDocuments } from "@/data/legal";
 import { formatAccessDate, locales, type Locale } from "@/lib/i18n";
+import { brandName } from "@/lib/i18n/brand";
 import { setLocalePreference, useLocale } from "@/lib/i18n/store";
 
 export function LegalPage({ kind, initialLocale }: { kind: "privacy" | "terms"; initialLocale: Locale }) {
@@ -15,13 +16,13 @@ export function LegalPage({ kind, initialLocale }: { kind: "privacy" | "terms"; 
 
   useEffect(() => {
     window.document.documentElement.lang = locale;
-    window.document.title = `${document.title} | МҰРА`;
+    window.document.title = `${document.title} | ${brandName(locale)}`;
     window.document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute("content", document.intro);
   }, [document, locale]);
 
   return <div className="legal-shell">
     <header className="legal-header">
-      <Link className="legal-brand" href="/" aria-label="МҰРА"><BrandMark /><span>МҰРА</span></Link>
+      <Link className="legal-brand" href="/" aria-label={brandName(locale)}><BrandMark /><span>{brandName(locale)}</span></Link>
       <div className="legal-header-actions">
         <ThemeToggle locale={locale} />
         <div className="locale-switch" role="group" aria-label={copy.languageLabel}>
@@ -32,7 +33,7 @@ export function LegalPage({ kind, initialLocale }: { kind: "privacy" | "terms"; 
       </div>
     </header>
     <main className="legal-main">
-      <div className="legal-kicker">МҰРА / {kind === "privacy" ? copy.privacyLink : copy.termsLink}</div>
+      <div className="legal-kicker">{brandName(locale)} / {kind === "privacy" ? copy.privacyLink : copy.termsLink}</div>
       <h1>{document.title}</h1>
       <p className="legal-intro">{document.intro}</p>
       <p className="legal-date">{copy.updated}: <time dateTime={legalUpdatedOn}>{formatAccessDate(locale, legalUpdatedOn)}</time></p>
@@ -56,7 +57,7 @@ export function LegalPage({ kind, initialLocale }: { kind: "privacy" | "terms"; 
     <footer className="legal-footer">
       <Link href="/privacy" aria-current={kind === "privacy" ? "page" : undefined}>{copy.privacyLink}</Link>
       <Link href="/terms" aria-current={kind === "terms" ? "page" : undefined}>{copy.termsLink}</Link>
-      <Link href="/">МҰРА</Link>
+      <Link href="/">{brandName(locale)}</Link>
     </footer>
   </div>;
 }

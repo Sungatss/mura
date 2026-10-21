@@ -8,6 +8,7 @@ import type { Era, EventFeature, HistoricalFigure } from "@/lib/atlas/types";
 import type { GuideTurn } from "@/lib/guide/validation";
 import { MAX_QUESTION_LENGTH } from "@/lib/guide/validation";
 import type { Locale } from "@/lib/i18n";
+import { brandName } from "@/lib/i18n/brand";
 
 type Citation = { id: string; title: string; url: string };
 type Message = { role: "user" | "assistant"; text: string; citations?: Citation[]; supported?: boolean };
@@ -165,7 +166,7 @@ export function GuidePanel({ open, onClose, era, event, figure, loadState, local
           <div className="guide-suggestions">{suggestions.map((question) => <button type="button" key={question} onClick={() => void ask(question)}>{question}</button>)}</div>
         </div>}
         {messages.map((message, index) => <article key={index} className={`guide-message guide-message-${message.role}`}>
-          <span className="guide-message-label">{message.role === "user" ? copy.guideYou : "МҰРА"}</span>
+          <span className="guide-message-label">{message.role === "user" ? copy.guideYou : brandName(locale)}</span>
           <p>{message.text}</p>
           {message.citations && message.citations.length > 0 && <div className="guide-citations">
             <strong>{copy.sources}</strong>

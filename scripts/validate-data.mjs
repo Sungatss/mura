@@ -50,14 +50,18 @@ const placeIds = new Set();
 for (const place of historicalPlaces) {
   assert.ok(place.id && !placeIds.has(place.id), `duplicate historical place ${place.id}`);
   placeIds.add(place.id);
-  assert.ok(eraIds.has(place.eraId) && eventIds.has(place.eventId), `${place.id}: broken era or event link`);
-  assert.ok(historicalDatasets.some((data, index) => eras.filter((era) => era.kind === "historical-reconstruction")[index]?.id === place.eraId
+  assert.ok(eraIds.has(place.eraId) && (!place.eventId || eventIds.has(place.eventId)), `${place.id}: broken era or event link`);
+  assert.ok(!place.eventId || historicalDatasets.some((data, index) => eras.filter((era) => era.kind === "historical-reconstruction")[index]?.id === place.eraId
     && data.events.features.some((event) => event.properties.id === place.eventId)), `${place.id}: linked event belongs to another period`);
+  assert.ok((place.visibleEraIds ?? [place.eraId]).every((id) => eraIds.has(id)), `${place.id}: invalid visible period`);
+  assert.ok(["center", "settlement", "cultural", "assembly"].includes(place.kind ?? "settlement"), `${place.id}: invalid place kind`);
   assert.ok(place.coordinates[0] >= 40 && place.coordinates[0] <= 90 && place.coordinates[1] >= 40 && place.coordinates[1] <= 56,
     `${place.id}: location outside Kazakhstan`);
   assert.ok(place.sourceUrl.startsWith("https://kazakhstan.travel/") || place.sourceUrl.startsWith("https://www.kazakhstan.travel/"), `${place.id}: location source missing`);
+  assert.ok(!place.politicalStatus || place.politicalSourceUrl?.startsWith("https://e-history.kz/"), `${place.id}: political status needs a source`);
   for (const locale of ["ru", "kk", "en"]) {
     assert.ok(place.name[locale]?.trim() && place.description[locale]?.trim() && place.locationNote[locale]?.trim(), `${place.id}: missing ${locale} text`);
+    assert.ok(!place.politicalStatus || place.politicalStatus[locale]?.trim(), `${place.id}: missing ${locale} political status`);
   }
 }
 console.log(`Historical places valid: ${historicalPlaces.length} source-backed present-day locations, distinct from event coordinates.`);

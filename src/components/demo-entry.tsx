@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { AtlasShell } from "@/components/atlas/atlas-shell";
 import { BrandMark } from "@/components/brand-mark";
-import { ThemeToggle } from "@/components/theme-provider";
+import { ReadingModeToggle, ThemeToggle } from "@/components/theme-provider";
 import { accessCopy } from "@/data/demo-access-translations";
 import { legal } from "@/data/legal";
 import { useDemoProfile, saveDemoProfile } from "@/lib/demo-profile";
@@ -47,7 +47,7 @@ export function MuraEntry({ initialLocale }: { initialLocale: Locale }) {
     </section>
     <section className="access-side" aria-labelledby="access-form-title">
       <header className="access-side-header"><div className="access-side-brand"><BrandMark /><strong>{brandName(locale)}</strong></div>
-        <div className="access-preferences"><ThemeToggle locale={locale} /><div className="locale-switch" role="group" aria-label={legal[locale].languageLabel}>
+        <div className="access-preferences"><ReadingModeToggle locale={locale} /><ThemeToggle locale={locale} /><div className="locale-switch" role="group" aria-label={legal[locale].languageLabel}>
           {locales.map((option) => <button key={option} type="button" lang={option} aria-pressed={locale === option} onClick={() => setLocalePreference(option)}>{option.toUpperCase()}</button>)}
         </div></div></header>
       <div className="access-form-wrap">

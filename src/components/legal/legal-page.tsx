@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
-import { ThemeToggle } from "@/components/theme-provider";
+import { ReadingModeToggle, ThemeToggle } from "@/components/theme-provider";
 import { useEffect } from "react";
 import { legal, legalContact, legalOperator, legalUpdatedOn, providerDocuments } from "@/data/legal";
 import { formatAccessDate, locales, type Locale } from "@/lib/i18n";
@@ -24,7 +24,7 @@ export function LegalPage({ kind, initialLocale }: { kind: "privacy" | "terms"; 
     <header className="legal-header">
       <Link className="legal-brand" href="/" aria-label={brandName(locale)}><BrandMark /><span>{brandName(locale)}</span></Link>
       <div className="legal-header-actions">
-        <ThemeToggle locale={locale} />
+        <ReadingModeToggle locale={locale} /><ThemeToggle locale={locale} />
         <div className="locale-switch" role="group" aria-label={copy.languageLabel}>
           {locales.map((option) => <button key={option} type="button" aria-pressed={locale === option}
             onClick={() => setLocalePreference(option)}>{option.toUpperCase()}</button>)}

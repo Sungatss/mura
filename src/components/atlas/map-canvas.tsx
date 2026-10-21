@@ -5,7 +5,7 @@ import { useTheme } from "@/components/theme-provider";
 import { eventCategory, type EventCategory } from "@/data/event-categories";
 import { eventText } from "@/data/historical-translations";
 import { ui } from "@/data/ui-translations";
-import { historicalPlaces } from "@/data/historical-places";
+import { historicalPlaces, placeVisibleInEra, type HistoricalPlace } from "@/data/historical-places";
 import type { EraDataset, EventFeature, PointGeometry } from "@/lib/atlas/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -17,6 +17,12 @@ const MARKER_ICONS: Record<EventCategory, string> = {
   records: '<path d="M6 3h10l3 3v14H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Zm10 0v4h4M7 11h9M7 15h9"/>',
   diplomacy: '<path d="M3 8h5l4 4 4-4h5M3 16h5l4-4 4 4h5M8 8l4-3 4 3M8 16l4 3 4-3"/>',
   other: '<circle cx="12" cy="12" r="7"/><path d="M12 8v8m-4-4h8"/>',
+};
+const PLACE_ICONS: Record<NonNullable<HistoricalPlace["kind"]>, string> = {
+  center: '<path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-6h6v6M3 10l9-7 9 7"/>',
+  settlement: '<path d="M3 20h18M5 20V8l4-3 4 3v12M13 20V10l3-2 3 2v10M8 11h2m-2 4h2m7-3h1"/>',
+  cultural: '<path d="M3 20h18M6 20V8h12v12M4 8l8-5 8 5M10 20v-6h4v6M9 10h6"/>',
+  assembly: '<circle cx="12" cy="6" r="3"/><path d="M4 20v-3a8 8 0 0 1 16 0v3M3 20h18"/>',
 };
 
 function locatedEvent(feature: EventFeature, eraId: string): feature is EventFeature & { geometry: PointGeometry } {
@@ -34,6 +40,8 @@ type MapCanvasProps = {
   categoryFilter: EventCategory | "all";
   selectedEventId: string | null;
   selectedPlaceId: string | null;
+  visiblePlaceKinds: NonNullable<HistoricalPlace["kind"]>[];
+  showEventMarkers: boolean;
   compareEnabled: boolean;
   compareData: EraDataset | null;
   compareEraId: string;
@@ -42,7 +50,7 @@ type MapCanvasProps = {
   onSelectPlace?: (id: string) => void;
 };
 
-export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId, selectedPlaceId, compareEnabled, compareData, compareEraId, compareBalance, onSelectEvent, onSelectPlace }: MapCanvasProps) {
+export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId, selectedPlaceId, visiblePlaceKinds, showEventMarkers, compareEnabled, compareData, compareEraId, compareBalance, onSelectEvent, onSelectPlace }: MapCanvasProps) {
   const { theme } = useTheme();
   const themeRef = useRef(theme);
   const lastFitData = useRef<EraDataset | null>(null);
@@ -321,7 +329,7 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
     for (const marker of markers.values()) marker.remove();
     markers.clear();
     const copy = ui[locale];
-    for (const feature of compareEnabled ? [] : data?.events.features ?? []) {
+    for (const feature of compareEnabled || !showEventMarkers ? [] : data?.events.features ?? []) {
       if (!locatedEvent(feature, eraId)) continue;
       const category = eventCategory(feature.properties.id);
       if (categoryFilter !== "all" && category !== categoryFilter) continue;
@@ -355,7 +363,7 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
       for (const marker of markers.values()) marker.remove();
       markers.clear();
     };
-  }, [data, eraId, locale, categoryFilter, mapState, compareEnabled]);
+  }, [data, eraId, locale, categoryFilter, mapState, compareEnabled, showEventMarkers]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -366,12 +374,17 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
     markers.clear();
     if (compareEnabled) return;
     const copy = ui[locale];
-    for (const place of historicalPlaces.filter((item) => item.eraId === eraId)) {
+    for (const place of historicalPlaces.filter((item) => placeVisibleInEra(item, eraId) && visiblePlaceKinds.includes(item.kind ?? "settlement"))) {
+      const kind = place.kind ?? "settlement";
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "map-place-marker";
+      button.className = `map-place-marker map-place-${kind}`;
       button.setAttribute("aria-label", `${copy.placeLabel}: ${place.name[locale]}`);
-      button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s7-6.3 7-12a7 7 0 0 0-14 0c0 5.7 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>';
+      button.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PLACE_ICONS[kind]}</svg>`;
+      const mapName = document.createElement("span");
+      mapName.className = "map-place-name";
+      mapName.textContent = place.name[locale];
+      button.appendChild(mapName);
       const preview = document.createElement("span");
       preview.className = "map-marker-preview";
       const title = document.createElement("strong");
@@ -379,12 +392,17 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
       const note = document.createElement("span");
       note.textContent = place.locationNote[locale];
       preview.append(title, note);
+      if (place.politicalStatus) {
+        const status = document.createElement("span");
+        status.textContent = place.politicalStatus[locale];
+        preview.appendChild(status);
+      }
       button.appendChild(preview);
       button.addEventListener("click", () => onSelectPlaceRef.current?.(place.id));
       markers.set(place.id, new maplibregl.Marker({ element: button, anchor: "bottom" }).setLngLat(place.coordinates).addTo(map));
     }
     return () => { for (const marker of markers.values()) marker.remove(); markers.clear(); };
-  }, [eraId, locale, mapState, compareEnabled]);
+  }, [eraId, locale, mapState, compareEnabled, visiblePlaceKinds]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -395,6 +413,7 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
     const placeMarkers = placeMarkersRef.current;
     function updateClusters() {
       if (!map || !maplibregl) return;
+      if (containerRef.current) containerRef.current.dataset.detailZoom = map.getZoom() >= 5.2 ? "true" : "false";
       for (const marker of clusters) marker.remove();
       clusters.length = 0;
       const entries = [...eventMarkers.values(), ...placeMarkers.values()];
@@ -431,7 +450,7 @@ export function MapCanvas({ data, eraId, locale, categoryFilter, selectedEventId
       clusters.length = 0;
       for (const marker of [...eventMarkers.values(), ...placeMarkers.values()]) marker.getElement().style.display = "";
     };
-  }, [data, eraId, locale, categoryFilter, mapState, compareEnabled, mapRevision]);
+  }, [data, eraId, locale, categoryFilter, mapState, compareEnabled, mapRevision, visiblePlaceKinds, showEventMarkers]);
 
   useEffect(() => {
     for (const [id, marker] of markersRef.current) {

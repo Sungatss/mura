@@ -1013,3 +1013,91 @@ button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px sol
   .shezhire-visual-hint { padding: 7px 12px; font-size: 9px; }
 }
 @media (max-width: 380px) { .compare-toggle { width: auto; max-width: 100%; margin-top: 12px; } .place-legend { left: 12px; } }
+
+/* Sourced places, a non-geographic war chronicle, and an independent map stage. */
+.map-place-center { --marker-color: #a77d3e; border-radius: 50% 50% 7px 7px; }
+.map-place-settlement { --marker-color: #347f89; }
+.map-place-cultural { --marker-color: #805b8c; border-radius: 50%; }
+.map-place-assembly { --marker-color: #8b6644; }
+.map-place-name { display: none; position: absolute; left: calc(100% + 6px); top: 50%; width: max-content; max-width: 135px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--navy); box-shadow: var(--shadow); font: 700 10px/1.25 var(--sans); text-align: left; transform: translateY(-50%); pointer-events: none; }
+[data-detail-zoom="true"] .map-place-name, .map-place-marker.is-selected .map-place-name { display: block; }
+.map-layer-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 32px; margin-top: 7px; padding: 5px 3px; border: 0; border-top: 1px solid var(--line); background: transparent; color: var(--accent); font: 700 11px/1.3 var(--sans); cursor: pointer; }
+.map-tools:not(.is-expanded) { top: 125px; width: max-content; max-width: calc(100% - 84px); padding: 5px 9px; }
+.map-layer-trigger { justify-content: flex-start; gap: 8px; margin: 0; border: 0; white-space: nowrap; }
+.map-layer-trigger > span { margin-left: auto; }
+.map-layer-trigger svg { flex: none; }
+.map-tools.is-expanded .map-layer-trigger { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.map-layer-list { display: grid; gap: 2px; max-height: min(240px, 38dvh); overflow: auto; padding: 3px 0; }
+.map-layer-list > label[for] { display: block; margin: 6px 0 0; }
+.map-layer-list label { display: flex; align-items: center; gap: 8px; min-height: 32px; margin: 0; color: var(--navy); font: 500 11px/1.3 var(--sans); letter-spacing: 0; text-transform: none; cursor: pointer; }
+.map-layer-list input { width: 16px; height: 16px; flex: none; accent-color: var(--gold); }
+.war-chronicle { position: absolute; z-index: 2; right: 18px; bottom: 44px; width: min(330px, calc(100% - 40px)); max-height: min(248px, 42%); display: grid; gap: 7px; overflow: hidden; padding: 12px; border: 1px solid var(--gold); border-radius: 13px; background: color-mix(in srgb, var(--paper) 95%, transparent); color: var(--navy); box-shadow: var(--shadow); }
+.war-chronicle-heading { display: flex; align-items: center; gap: 7px; color: var(--accent); font: 700 11px/1.2 var(--sans); }
+.war-chronicle-heading svg { width: 17px; height: 17px; }
+.war-chronicle-events { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; }
+.war-chronicle-events button { flex: 0 0 min(175px, 78%); display: grid; align-content: start; gap: 3px; min-height: 56px; padding: 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--navy); text-align: left; cursor: pointer; }
+.war-chronicle-events button:hover { border-color: var(--gold); background: var(--paper); }
+.war-chronicle-events button span { color: var(--accent); font: 700 10px/1.2 var(--sans); }
+.war-chronicle-events button strong { font: 600 11px/1.3 var(--sans); }
+.war-chronicle small { color: var(--muted); font: 10px/1.3 var(--sans); }
+.map-fullscreen-toggle { position: absolute; z-index: 7; top: 66px; right: 14px; display: flex; align-items: center; gap: 7px; min-height: 38px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); color: var(--navy); box-shadow: var(--shadow); font: 700 11px/1.2 var(--sans); cursor: pointer; }
+.map-fullscreen-toggle svg { width: 18px; height: 18px; flex: none; }
+.map-fullscreen-era { position: absolute; z-index: 7; top: 14px; left: 20px; display: grid; gap: 3px; max-width: min(230px, calc(100% - 95px)); padding: 8px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); color: var(--accent); box-shadow: var(--shadow); font: 700 10px/1.2 var(--sans); }
+.map-fullscreen-era select { width: 100%; min-width: 0; border: 0; background: var(--paper); color: var(--navy); font: 700 12px/1.4 var(--sans); }
+.atlas-workspace.is-fullscreen .map-region { position: fixed; inset: 0; z-index: 100; width: 100vw; height: 100dvh; min-height: 0; border-radius: 0; }
+.atlas-workspace.is-fullscreen .map-fullscreen-toggle { top: 14px; right: 14px; }
+.atlas-workspace.is-fullscreen .map-caption { display: none; }
+.atlas-workspace.is-fullscreen .map-tools { top: 78px; }
+.atlas-workspace.is-shezhire .map-fullscreen-toggle, .atlas-workspace.is-fullscreen.is-shezhire .map-fullscreen-toggle { top: auto; bottom: 64px; }
+@media (max-width: 960px) {
+  .atlas-workspace.is-fullscreen .map-region { display: block; }
+  .map-fullscreen-toggle span { display: none; }
+  .war-chronicle { right: 10px; bottom: 61px; width: min(300px, calc(100% - 20px)); max-height: 140px; padding: 9px; }
+  .war-chronicle small { font-size: 9px; }
+  .map-place-name { max-width: 95px; white-space: normal; }
+}
+
+/* Reading mode enlarges actual content and targets throughout the application. */
+.reading-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; padding: 8px 10px; border: 1px solid #6d7c7b66; border-radius: 9px; background: transparent; color: var(--header-text); font: 700 11px/1.2 var(--sans); cursor: pointer; }
+.reading-toggle:hover, .reading-toggle[aria-pressed="true"] { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 20%, var(--header)); }
+.access-preferences .reading-toggle { color: var(--navy); border-color: var(--line); }
+:root[data-reading="on"] { --muted: #42534f; --subtle: #59645a; }
+:root[data-theme="dark"][data-reading="on"] { --muted: #c9d4d1; --subtle: #b9c3bd; }
+:root[data-reading="on"] .atlas-workspace.layout-split { grid-template-columns: minmax(0, 1fr) 8px minmax(400px, var(--atlas-panel-width, 360px)); }
+:root[data-reading="on"] .timeline-region { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 13px 18px; }
+:root[data-reading="on"] .timeline-region .section-heading { flex-direction: row; align-items: baseline; gap: 12px; }
+:root[data-reading="on"] .timeline { gap: 13px; }
+:root[data-reading="on"] .timeline-option { flex: 0 0 135px; min-height: 52px; font-size: 17px !important; }
+:root[data-reading="on"] .compare-toggle { grid-column: 1; justify-self: start; width: auto; min-height: 48px; max-width: min(100%, 220px); padding: 8px 14px; }
+@media (min-width: 961px) {
+  :root[data-reading="on"] .timeline-region { position: relative; padding-right: 245px; }
+  :root[data-reading="on"] .compare-toggle { position: absolute; top: 14px; right: 18px; width: 210px; }
+}
+:root[data-reading="on"] :is(.atlas-panel, .guide-panel, .learn-body, .legal-main, .access-side) { line-height: 1.7; }
+:root[data-reading="on"] :is(.panel-intro, .era-description, .detail-copy, .event-detail p, .place-detail p, .character-card-summary, .guide-message p, .guide-intro p, .learn-intro, .learn-feedback p, .learn-evidence p, .learn-result p, .shezhire-panel p, .legal-sections p, .legal-intro, .access-heading p, .access-form label, .access-demo-note) { font-size: 18px !important; line-height: 1.75 !important; }
+:root[data-reading="on"] :is(.content-row-main, .timeline-option, .character-card-title, .learn-activity h3, .guide-top h2, .shezhire-visual-top h2) { font-size: 22px !important; line-height: 1.4 !important; }
+:root[data-reading="on"] :is(.panel-overline, .content-row-date, .content-row-meta, .map-legend, .place-legend, .map-caption, .map-tools label, .map-tools select, .map-layer-list label, .map-place-name, .map-marker-preview, .war-chronicle, .war-chronicle small, .learn-counter, .learn-context, .learn-progress, .guide-context, .guide-disclaimer, .shezhire-visual-hint, .shezhire-visual-search, .shezhire-graph-ru, .legal-date, .legal-kicker) { font-size: 15px !important; line-height: 1.5 !important; }
+:root[data-reading="on"] :is(.guide-trigger, .reading-toggle, .theme-toggle, .locale-switch button, .layout-controls button, .map-fullscreen-toggle, .map-layer-trigger, .map-layer-list label, .timeline-option, .compare-toggle, .content-row, .learn-mode button, .learn-scope button, .learn-choices button, .learn-primary, .learn-navigation button, .guide-form button, .shezhire-visual-controls button, .shezhire-graph-node, .shezhire-graph-ru, .access-tabs button, .access-submit) { min-height: 48px; font-size: 16px; line-height: 1.4; }
+:root[data-reading="on"] :is(.map-event-marker, .map-place-marker) { min-width: 50px; min-height: 50px; }
+:root[data-reading="on"] :is(.map-event-marker, .map-place-marker) > svg { width: 27px; height: 27px; }
+:root[data-reading="on"] :is(.maplibregl-ctrl-group button, .shezhire-visual-controls button, .shezhire-branch-toggle) { min-width: 48px; min-height: 48px; }
+:root[data-reading="on"] :is(.war-chronicle-events button, .war-chronicle-events button strong, .war-chronicle-events button span) { font-size: 15px; line-height: 1.4; }
+:root[data-reading="on"] :is(.guide-form textarea, .access-form input, .shezhire-visual-search input) { min-height: 48px; font-size: 18px; line-height: 1.5; }
+:root[data-reading="on"] :is(.atlas-panel, .learn-body, .guide-messages, .legal-main) { padding-left: 28px; padding-right: 28px; }
+@media (max-width: 960px) { :root[data-reading="on"] .atlas-workspace.layout-split { display: flex; } }
+@media (max-width: 600px) {
+  .header-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+  .header-actions > .reading-toggle, .header-actions > .theme-toggle { flex: 0 0 42px; }
+  .header-actions > .reading-toggle span { display: none; }
+  .header-actions .locale-switch { flex: 0 0 auto; }
+  .header-actions .profile-menu { margin-left: auto; }
+  .header-actions > .guide-trigger { flex: 1 1 29%; min-width: 0; }
+  .map-fullscreen-toggle { top: 56px; right: 9px; }
+  .map-tools:not(.is-expanded) { top: 57px; }
+  .map-caption { display: none; }
+  .war-chronicle { max-height: 112px; }
+  .war-chronicle-events button { min-height: 45px; padding: 6px 8px; }
+  .war-chronicle small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  :root[data-reading="on"] :is(.atlas-panel, .learn-body, .guide-messages, .legal-main) { padding-left: 18px; padding-right: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .map-event-marker::before, .map-place-marker::before { animation: none; } }

@@ -16,10 +16,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const theme = (await cookies()).get("mura-theme")?.value === "dark" ? "dark" : "light";
+  const preferences = await cookies();
+  const theme = preferences.get("mura-theme")?.value === "dark" ? "dark" : "light";
+  const reading = preferences.get("mura-reading")?.value === "on";
   return (
-    <html lang={await requestLocale()} data-theme={theme}>
-      <body><ThemeProvider initialTheme={theme}>{children}</ThemeProvider></body>
+    <html lang={await requestLocale()} data-theme={theme} data-reading={reading ? "on" : "off"}>
+      <body><ThemeProvider initialTheme={theme} initialReading={reading}>{children}</ThemeProvider></body>
     </html>
   );
 }

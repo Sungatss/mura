@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { BrandMark } from "@/components/brand-mark";
-import { ThemeToggle } from "@/components/theme-provider";
+import { ReadingModeToggle, ThemeToggle } from "@/components/theme-provider";
 import { DemoProfileMenu } from "@/components/demo-profile-menu";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GuidePanel } from "./guide-panel";
@@ -18,7 +18,7 @@ import { figureArtwork } from "@/data/figure-artwork";
 import { eraHistoryImages, eventHistoryImages, figureHistoryImages } from "@/data/history-images";
 import { figureSignificance } from "@/data/figure-profiles";
 import { ui } from "@/data/ui-translations";
-import { historicalPlaces } from "@/data/historical-places";
+import { historicalPlaces, placeVisibleInEra, type HistoricalPlace } from "@/data/historical-places";
 import { legal } from "@/data/legal";
 import { eraText, eventText, figureText, sourceNote, sourceTitle, territoryText } from "@/data/historical-translations";
 import type { Era, EraDataset, EventFeature, HistoricalFigure } from "@/lib/atlas/types";
@@ -134,20 +134,25 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const [guideOpen, setGuideOpen] = useState(false);
   const [learningOpen, setLearningOpen] = useState(false);
   const [shezhireOpen, setShezhireOpen] = useState(false);
+  const [shezhireDetailOpen, setShezhireDetailOpen] = useState(false);
   const [selectedZhuzId, setSelectedZhuzId] = useState<string | null>(null);
   const [selectedRuId, setSelectedRuId] = useState<string | null>(null);
   const [mobile, setMobile] = useState(false);
   const [layoutMode, setLayoutMode] = useState<"split" | "map" | "panel">("split");
+  const [fullscreen, setFullscreen] = useState(false);
+  const [layersOpen, setLayersOpen] = useState(false);
+  const [visiblePlaceKinds, setVisiblePlaceKinds] = useState<NonNullable<HistoricalPlace["kind"]>[]>(["center", "settlement", "cultural", "assembly"]);
+  const [showEventMarkers, setShowEventMarkers] = useState(true);
+  const [showWarChronicle, setShowWarChronicle] = useState(true);
   const [panelWidth, setPanelWidth] = useState(360);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const closeGuide = useCallback(() => setGuideOpen(false), []);
   const closeLearning = useCallback(() => setLearningOpen(false), []);
   const closeShezhire = useCallback(() => {
-    if (window.matchMedia("(max-width: 960px)").matches && (selectedZhuzId || selectedRuId)) {
-      setSelectedZhuzId(null); setSelectedRuId(null);
-    } else setShezhireOpen(false);
-  }, [selectedZhuzId, selectedRuId]);
+    if (window.matchMedia("(max-width: 960px)").matches && shezhireDetailOpen) setShezhireDetailOpen(false);
+    else setShezhireOpen(false);
+  }, [shezhireDetailOpen]);
   const copy = ui[locale];
   const selectedEra = eras.find((era) => era.id === selectedId) ?? eras[0];
   const compareEra = eras.find((era) => era.id === compareId) ?? eras[1];
@@ -165,6 +170,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   const locatedCount = events.filter((feature) => feature.geometry
     && (selectedEra.kind === "technical-fixture" || !!feature.properties.coordinateSourceIds?.length)
     && (categoryFilter === "all" || eventCategory(feature.properties.id) === categoryFilter)).length;
+  const visiblePlaces = historicalPlaces.filter((place) => placeVisibleInEra(place, selectedId) && visiblePlaceKinds.includes(place.kind ?? "settlement"));
+  const warEvents = events.filter((feature) => eventCategory(feature.properties.id) === "conflict" && !feature.geometry);
   const activeEvent = events.find((feature) => feature.properties.id === selectedEventId);
   const activePlace = historicalPlaces.find((place) => place.id === selectedPlaceId);
   const eraFigures = figures.filter((figure) => figure.eraIds.includes(selectedId));
@@ -198,9 +205,17 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   }, []);
 
   function changeLayout(mode: "split" | "map" | "panel") {
+    setFullscreen(false);
     setLayoutMode(mode);
     localStorage.setItem("mura-layout-mode", mode);
   }
+
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setFullscreen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [fullscreen]);
 
   function resizePanel(clientX: number) {
     const rect = workspaceRef.current?.getBoundingClientRect();
@@ -212,6 +227,8 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   function selectShezhire(zhuzId: string | null, ruId: string | null) {
     setSelectedZhuzId(zhuzId);
     setSelectedRuId(ruId);
+    setShezhireDetailOpen(Boolean(zhuzId));
+    if (fullscreen && zhuzId) setFullscreen(false);
   }
 
   function selectEra(id: string) {
@@ -247,6 +264,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   }
 
   function openEvent(id: string, fromMap = false) {
+    if (fullscreen) { setFullscreen(false); if (!mobile) changeLayout("split"); }
     const selected = events.find((feature) => feature.properties.id === id);
     if (selected?.geometry && categoryFilter !== "all" && eventCategory(id) !== categoryFilter) setCategoryFilter("all");
     setGuideOpen(false);
@@ -271,6 +289,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
   }
 
   function openPlace(id: string) {
+    if (fullscreen) { setFullscreen(false); if (!mobile) changeLayout("split"); }
     setSelectedPlaceId(id);
     setSelectedEventId(null);
     setSelectedFigureId(null);
@@ -377,6 +396,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
       </div>
       <div className="header-actions">
         <span className="header-status"><span aria-hidden="true" />{copy.headerStatus}</span>
+        <ReadingModeToggle locale={locale} />
         <ThemeToggle locale={locale} />
         <div className="locale-switch" role="group" aria-label={copy.languageLabel}>
           {(["kk", "ru", "en"] as const).map((option) => <button key={option} type="button"
@@ -397,7 +417,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
         <DemoProfileMenu locale={locale} />
       </div>
     </header>
-    <div ref={workspaceRef} className={`atlas-workspace layout-${layoutMode}${shezhireOpen ? " is-shezhire" : ""}`} style={{ "--atlas-panel-width": `${panelWidth}px` } as React.CSSProperties}>
+    <div ref={workspaceRef} className={`atlas-workspace layout-${layoutMode}${shezhireOpen ? " is-shezhire" : ""}${fullscreen ? " is-fullscreen" : ""}`} style={{ "--atlas-panel-width": `${panelWidth}px` } as React.CSSProperties}>
       <nav className="timeline-region" aria-label={copy.timelineLabel}>
         <div className="section-heading"><h2>{copy.periods}</h2><span>{formatCount(locale, historicalEras.length, copy.cuts.split("|") as [string, string, string])}</span></div>
         <div className="timeline" role="group" aria-label={copy.timelineGroup}>
@@ -431,19 +451,31 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
       <section className="map-region" aria-label={shezhireOpen ? copy.shezhireTitle : copy.mapLabel}>
         <div className={`map-mode-content${shezhireOpen ? " is-hidden" : ""}`} aria-hidden={shezhireOpen} inert={shezhireOpen}>
         <MapCanvas data={data} eraId={selectedId} locale={locale} categoryFilter={categoryFilter}
+          visiblePlaceKinds={visiblePlaceKinds} showEventMarkers={showEventMarkers}
           compareEnabled={compareOpen} compareData={compareData} compareEraId={compareId} compareBalance={compareBalance}
           selectedEventId={selectedEventId} selectedPlaceId={selectedPlaceId} onSelectEvent={(id) => openEvent(id, true)} onSelectPlace={openPlace} />
         <div className="map-caption"><span className="caption-rule" aria-hidden="true" />{copy.mapCaption}</div>
-        {selectedEra.kind === "historical-reconstruction" && !compareOpen && <div className="map-tools">
-          <label htmlFor="map-category-filter">{copy.mapFilterLabel}</label>
-          <select id="map-category-filter" value={categoryFilter}
-            onChange={(event) => setCategoryFilter(event.target.value as EventCategory | "all")}>
-            <option value="all">{copy.mapCategoryAll}</option>
-            {categories.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}
-          </select>
+        {selectedEra.kind === "historical-reconstruction" && !compareOpen && <div className={`map-tools${layersOpen ? " is-expanded" : ""}`}>
+          <button type="button" className="map-layer-trigger" aria-expanded={layersOpen} onClick={() => setLayersOpen((open) => !open)}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18M8 3v6m8 0v6m-8 0v6"/></svg>{copy.mapLayers} <span aria-hidden="true">{layersOpen ? "−" : "+"}</span></button>
+          {layersOpen && <div className="map-layer-list">
+            <label htmlFor="map-category-filter">{copy.mapFilterLabel}</label>
+            <select id="map-category-filter" value={categoryFilter}
+              onChange={(event) => setCategoryFilter(event.target.value as EventCategory | "all")}>
+              <option value="all">{copy.mapCategoryAll}</option>
+              {categories.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}
+            </select>
+            {(["center", "settlement", "cultural", "assembly"] as const).map((kind) => <label key={kind}><input type="checkbox" checked={visiblePlaceKinds.includes(kind)} onChange={() => setVisiblePlaceKinds((current) => current.includes(kind) ? current.filter((item) => item !== kind) : [...current, kind])} />{kind === "center" ? copy.mapLayerCenters : kind === "settlement" ? copy.mapLayerSettlements : kind === "cultural" ? copy.mapLayerCulture : copy.mapLayerAssemblies}</label>)}
+            <label><input type="checkbox" checked={showEventMarkers} onChange={() => setShowEventMarkers((value) => !value)} />{copy.mapLayerEvents}</label>
+            <label><input type="checkbox" checked={showWarChronicle} onChange={() => setShowWarChronicle((value) => !value)} />{copy.mapLayerWars}</label>
+          </div>}
         </div>}
-        {loadState === "ready" && !compareOpen && selectedEra.kind === "historical-reconstruction" && locatedCount === 0 && !historicalPlaces.some((place) => place.eraId === selectedId)
+        {loadState === "ready" && !compareOpen && selectedEra.kind === "historical-reconstruction" && locatedCount === 0 && visiblePlaces.length === 0
           && <div className="map-empty" role="status">{copy.mapNoLocatedEvents}</div>}
+        {!compareOpen && showWarChronicle && warEvents.length > 0 && <div className="war-chronicle" aria-label={copy.mapLayerWars}>
+          <div className="war-chronicle-heading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m4 4 16 16M20 4 4 20M4 4l4 1-3 3m15-4-4 1 3 3"/></svg><strong>{copy.mapLayerWars}</strong></div>
+          <div className="war-chronicle-events">{warEvents.map((feature) => <button type="button" key={feature.properties.id} onClick={() => openEvent(feature.properties.id, true)}><span>{eventText(feature.properties, "dateLabel", locale)}</span><strong>{eventText(feature.properties, "name", locale)}</strong></button>)}</div>
+          <small>{copy.mapWarsNote}</small>
+        </div>}
         {selectedEra.kind === "historical-reconstruction" && <div className={`map-legend${compareOpen ? " is-comparing" : ""}`}>
           {compareOpen ? <>{selectedHasTerritory && <span className="compare-legend-item"><i className="compare-swatch" aria-hidden="true" />{eraText(selectedEra, "label", locale)}</span>}
             {compareHasTerritory && <span className="compare-legend-item"><i className="compare-swatch compare-swatch-second" aria-hidden="true" />{eraText(compareEra, "label", locale)}</span>}
@@ -451,17 +483,19 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
             : <>{selectedHasTerritory ? <><span className="legend-line" aria-hidden="true" />{copy.approxReconstruction}</> : copy.noTerritories}
               {events.some((feature) => feature.geometry) && <span className="legend-marker">{copy.approxMarker}</span>}</>}
         </div>}
-        {historicalPlaces.some((place) => place.eraId === selectedId) && !compareOpen && <div className="place-legend"><span className="place-legend-diamond" aria-hidden="true" />{copy.placeLabel}</div>}
+        {visiblePlaces.length > 0 && !compareOpen && <div className="place-legend"><span className="place-legend-diamond" aria-hidden="true" />{copy.placeLabel}</div>}
         {selectedEra.kind === "technical-fixture" && <div className="map-fixture-label">{copy.fixtureMapLabel}</div>}
         </div>
         {shezhireOpen && <ShezhireTree locale={locale} selectedZhuzId={selectedZhuzId} selectedRuId={selectedRuId} onSelect={selectShezhire} />}
+        {fullscreen && !shezhireOpen && <label className="map-fullscreen-era">{copy.periods}<select value={selectedId} onChange={(event) => selectEra(event.target.value)}>{historicalEras.map((era) => <option key={era.id} value={era.id}>{eraText(era, "label", locale)}</option>)}</select></label>}
+        <button type="button" className="map-fullscreen-toggle" aria-label={fullscreen ? copy.fullscreenExit : shezhireOpen ? copy.treeFullscreen : copy.mapFullscreen} title={fullscreen ? copy.fullscreenExit : shezhireOpen ? copy.treeFullscreen : copy.mapFullscreen} onClick={() => setFullscreen((value) => !value)}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">{fullscreen ? <path d="M3 9h6V3m6 0v6h6M9 21v-6H3m18 0h-6v6"/> : <path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/>}</svg><span>{fullscreen ? copy.fullscreenExit : shezhireOpen ? copy.treeFullscreen : copy.mapFullscreen}</span></button>
       </section>
       <div className="workspace-divider" role="separator" aria-orientation="vertical" aria-label={copy.layoutResize} tabIndex={layoutMode === "split" ? 0 : -1}
         onPointerDown={(event) => { if (layoutMode !== "split") return; event.currentTarget.setPointerCapture(event.pointerId); }}
         onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) resizePanel(event.clientX); }}
         onPointerUp={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); localStorage.setItem("mura-panel-width", String(panelWidth)); }}
         onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); const width = Math.max(280, Math.min(700, panelWidth + (event.key === "ArrowLeft" ? 24 : -24))); setPanelWidth(width); localStorage.setItem("mura-panel-width", String(width)); } }} />
-      <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen || shezhireOpen ? " is-guide-open" : ""}${shezhireOpen && mobile && !selectedZhuzId ? " shezhire-graph-only" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : shezhireOpen ? "shezhire-title" : "panel-title"}>
+      <aside ref={panelRef} className={`atlas-panel${guideOpen || learningOpen || shezhireOpen ? " is-guide-open" : ""}${shezhireOpen && mobile && !shezhireDetailOpen ? " shezhire-graph-only" : ""}`} aria-labelledby={guideOpen ? "guide-title" : learningOpen ? "learn-title" : shezhireOpen ? "shezhire-title" : "panel-title"}>
         <div className="atlas-panel-content" hidden={guideOpen || learningOpen || shezhireOpen}>
         <div className="panel-overline">{activePlace ? copy.placeLabel : compareOpen ? copy.compareMode : activeEvent ? copy.eventTag : activeFigure ? copy.figureTag : copy.overviewTag}</div>
         {activePlace ? <section className="place-detail" aria-labelledby="panel-title">
@@ -469,8 +503,9 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           <span className="place-detail-icon" aria-hidden="true">◇</span><h1 id="panel-title">{activePlace.name[locale]}</h1>
           <p className="detail-copy">{activePlace.description[locale]}</p>
           <p className="certainty-note">{activePlace.locationNote[locale]}</p>
+          {activePlace.politicalStatus && <p className="certainty-note">{activePlace.politicalStatus[locale]} {activePlace.politicalSourceUrl && <a href={activePlace.politicalSourceUrl} target="_blank" rel="noopener noreferrer">e-history.kz ↗</a>}</p>}
           <a href={activePlace.sourceUrl} target="_blank" rel="noopener noreferrer" className="place-source">{copy.placeSource} ↗</a>
-          <button type="button" className="place-related" onClick={() => openEvent(activePlace.eventId)}>{copy.placeRelatedEvent}: {(() => { const linked = events.find((feature) => feature.properties.id === activePlace.eventId); return linked ? eventText(linked.properties, "name", locale) : activePlace.name[locale]; })()} ↗</button>
+          {activePlace.eventId && <button type="button" className="place-related" onClick={() => openEvent(activePlace.eventId!)}>{copy.placeRelatedEvent}: {(() => { const linked = events.find((feature) => feature.properties.id === activePlace.eventId); return linked ? eventText(linked.properties, "name", locale) : activePlace.name[locale]; })()} ↗</button>}
         </section> : compareOpen ? <section className="compare-panel" aria-labelledby="panel-title">
           <h1 id="panel-title">{copy.compareTitle}</h1><p className="panel-intro">{copy.compareIntro}</p>
           <p className="certainty-note">{selectedHasTerritory || compareHasTerritory ? copy.boundaryApprox : copy.noTerritories}</p>
@@ -615,7 +650,7 @@ export function AtlasShell({ initialLocale }: { initialLocale: Locale }) {
           open={guideOpen} onClose={closeGuide} era={selectedEra} event={activeEvent} figure={activeFigure} loadState={loadState} locale={locale} />
         <LearningPanel key={`${selectedId}:${selectedFigureId ?? ""}`} open={learningOpen} onClose={closeLearning}
           era={selectedEra} figure={activeFigure} locale={locale} />
-        <ShezhirePanel open={shezhireOpen && (!mobile || !!selectedZhuzId)} onClose={closeShezhire} onExploreFigure={exploreShezhireFigure} locale={locale}
+        <ShezhirePanel open={shezhireOpen && (!mobile || shezhireDetailOpen)} onClose={closeShezhire} onExploreFigure={exploreShezhireFigure} locale={locale}
           selectedZhuzId={selectedZhuzId} selectedRuId={selectedRuId} onSelect={selectShezhire} />
       </aside>
     </div>
